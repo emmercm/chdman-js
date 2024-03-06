@@ -120,8 +120,7 @@ export default {
     const output = await this.run(['info', '--input', inputFilename, '--verbose']);
 
     const parsedKeys = new Map<string, string>();
-    for (const line of output
-      .split('\n')) {
+    for (const line of output.split(/\r?\n/)) {
       const split = line.split(/^([^ ][^:]+): +(.+)$/);
       if (split.length === 4) {
         parsedKeys.set(split[1].toUpperCase(), split[2]);
