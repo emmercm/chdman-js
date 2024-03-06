@@ -29,7 +29,7 @@ function findRoot(filePath = url.fileURLToPath(new URL('.', import.meta.url))): 
  */
 function getBinPath(): string | undefined {
   const rootDirectory = findRoot() ?? process.cwd();
-  const prebuilt = path.join(rootDirectory, 'bin', process.platform, process.arch, 'chdman' + (process.platform === 'win32' ? '.exe' : ''));
+  const prebuilt = path.join(rootDirectory, 'bin', process.platform, process.arch, `chdman${process.platform === 'win32' ? '.exe' : ''}`);
   if (fs.existsSync(prebuilt)) {
     return prebuilt;
   }
@@ -43,47 +43,6 @@ function getBinPath(): string | undefined {
 }
 
 const CHDMAN_BIN = getBinPath();
-
-/**
- * Run chdman with some arguments.
- */
-async function run(arguments_: string[]): Promise<string> {
-  if (!CHDMAN_BIN) {
-    throw new Error('chdman not found');
-  }
-
-  // if (process.platform === 'darwin'
-  // && !fs.existsSync(path.join('Library', 'Frameworks', 'SDL2.framework'))) {
-  //   throw new Error('chdman requires the SDL2 framework to be installed on macOS');
-  // }
-
-  return new Promise<string>((resolve, reject) => {
-    const proc = child_process.spawn(CHDMAN_BIN, arguments_, { windowsHide: true });
-    let killed = false;
-
-    const chunks: Buffer[] = [];
-    proc.stdout.on('data', (chunk) => {
-      chunks.push(chunk);
-    });
-    proc.stderr.on('data', (chunk) => {
-      chunks.push(chunk);
-      if (chunk.toString().includes('nan% complete')) {
-        // chdman can hang forever on input files that aren't valid (i.e. too small)
-        proc.kill();
-        killed = true;
-      }
-    });
-
-    proc.on('exit', (code) => {
-      const output = Buffer.concat(chunks).toString();
-      if ((code !== null && code !== 0) || killed) {
-        return reject(output);
-      }
-      return resolve(output);
-    });
-    proc.on('error', reject);
-  });
-}
 
 interface ChdmanInfo {
   inputFile: string,
@@ -110,6 +69,47 @@ interface ChdmanMetadata {
 
 export default {
   /**
+   * Run chdman with some arguments.
+   */
+  async run(arguments_: string[]): Promise<string> {
+    if (!CHDMAN_BIN) {
+      throw new Error('chdman not found');
+    }
+
+    // if (process.platform === 'darwin'
+    // && !fs.existsSync(path.join('Library', 'Frameworks', 'SDL2.framework'))) {
+    //   throw new Error('chdman requires the SDL2 framework to be installed on macOS');
+    // }
+
+    return new Promise<string>((resolve, reject) => {
+      const proc = child_process.spawn(CHDMAN_BIN, arguments_, { windowsHide: true });
+      let killed = false;
+
+      const chunks: Buffer[] = [];
+      proc.stdout.on('data', (chunk) => {
+        chunks.push(chunk);
+      });
+      proc.stderr.on('data', (chunk) => {
+        chunks.push(chunk);
+        if (chunk.toString().includes('nan% complete')) {
+          // chdman can hang forever on input files that aren't valid (i.e. too small)
+          proc.kill();
+          killed = true;
+        }
+      });
+
+      proc.on('exit', (code) => {
+        const output = Buffer.concat(chunks).toString();
+        if ((code !== null && code !== 0) || killed) {
+          return reject(output);
+        }
+        return resolve(output);
+      });
+      proc.on('error', reject);
+    });
+  },
+
+  /**
    * Return info about a CHD file.
    */
   async info(inputFilename: string): Promise<ChdmanInfo> {
@@ -117,7 +117,7 @@ export default {
       throw new Error(`input file doesn't exist: ${inputFilename}`);
     }
 
-    const output = await run(['info', '--input', inputFilename, '--verbose']);
+    const output = await this.run(['info', '--input', inputFilename, '--verbose']);
 
     const parsedKeys = new Map<string, string>();
     for (const line of output
@@ -170,7 +170,7 @@ export default {
   async createHd(inputFilename: string, outputChdFilename: string): Promise<void> {
     const existedBefore = await util.promisify(fs.exists)(outputChdFilename);
     try {
-      await run(['createhd', '--input', inputFilename, '--output', outputChdFilename, '--numprocessors', String(os.cpus().length)]);
+      await this.run(['createhd', '--input', inputFilename, '--output', outputChdFilename, '--numprocessors', String(os.cpus().length)]);
     } catch (error) {
       // chdman can leave cruft when it fails
       if (!existedBefore) {
@@ -186,7 +186,7 @@ export default {
   async createCd(inputFilename: string, outputChdFilename: string): Promise<void> {
     const existedBefore = await util.promisify(fs.exists)(outputChdFilename);
     try {
-      await run(['createcd', '--input', inputFilename, '--output', outputChdFilename, '--numprocessors', String(os.cpus().length)]);
+      await this.run(['createcd', '--input', inputFilename, '--output', outputChdFilename, '--numprocessors', String(os.cpus().length)]);
     } catch (error) {
       // chdman can leave cruft when it fails
       if (!existedBefore) {
@@ -234,7 +234,7 @@ export default {
     outputCueFilename: string,
     outputBinFilename?: string,
   ): Promise<void> {
-    await run([
+    await this.run([
       'extractcd',
       '--input', inputChdFilename,
       '--output', outputCueFilename,
@@ -246,6 +246,6 @@ export default {
    * Extract a hard disk CHD.
    */
   async extractHd(inputChdFilename: string, outputFilename: string): Promise<void> {
-    await run(['extracthd', '--input', inputChdFilename, '--output', outputFilename]);
+    await this.run(['extracthd', '--input', inputChdFilename, '--output', outputFilename]);
   },
 };

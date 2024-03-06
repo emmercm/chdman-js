@@ -27,7 +27,15 @@ async function mktemp(prefix: string): Promise<string> {
 // https://unix.stackexchange.com/a/33634
 // https://www.duckstation.org/cue-maker/
 
-describe('HD', () => {
+describe('run', () => {
+  test('should print the help message', async () => {
+    const helpOutput = await chdman.run(['help']);
+    expect(helpOutput).toBeTruthy();
+    console.log(helpOutput);
+  });
+});
+
+describe('hard disk', () => {
   test('should fail on nonexistent file', async () => {
     const temporaryChd = `${await mktemp(path.join(os.tmpdir(), 'dummy'))}.chd`;
     const temporaryHd = `${await mktemp(path.join(os.tmpdir(), 'dummy'))}.hd`;
@@ -76,7 +84,7 @@ describe('HD', () => {
   });
 });
 
-describe('CD', () => {
+describe('CD-ROM', () => {
   test('should fail on nonexistent file', async () => {
     const temporaryChd = `${await mktemp(path.join(os.tmpdir(), 'dummy'))}.chd`;
     const temporaryCue = `${temporaryChd}.cue`;

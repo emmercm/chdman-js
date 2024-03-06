@@ -27,6 +27,7 @@ jobs:
           filters: |
             changes:
               - '.github/workflows/node-test.yml'
+              - 'bin/**'
               - 'src/**'
               - 'test/**'
               - '*'
