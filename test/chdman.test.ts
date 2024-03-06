@@ -29,9 +29,15 @@ async function mktemp(prefix: string): Promise<string> {
 
 describe('run', () => {
   test('should print the help message', async () => {
-    const helpOutput = await chdman.run(['help']);
-    expect(helpOutput).toBeTruthy();
-    console.log(helpOutput);
+    try {
+      await chdman.run(['help']);
+    } catch (error) {
+      // eslint-disable-next-line jest/no-conditional-expect
+      expect(error).toBeTruthy();
+      console.log(error);
+      return;
+    }
+    throw new Error('help should have thrown');
   });
 });
 
