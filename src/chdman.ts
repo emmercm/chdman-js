@@ -10,9 +10,9 @@ import util from 'node:util';
 /**
  * Find the root of the module (where package.json lives).
  */
-function findRoot(filePath = url.fileURLToPath(new URL('.', import.meta.url))): string | undefined {
+async function findRoot(filePath = url.fileURLToPath(new URL('.', import.meta.url))): Promise<string | undefined> {
   const fullPath = path.join(filePath, 'package.json');
-  if (fs.existsSync(fullPath)) {
+  if (await util.promisify(fs.exists)(fullPath)) {
     return filePath;
   }
 
@@ -24,25 +24,31 @@ function findRoot(filePath = url.fileURLToPath(new URL('.', import.meta.url))): 
   return undefined;
 }
 
+let CHDMAN_BIN: string | undefined;
+
 /**
  * Get the full path to chdman, if available.
  */
-function getBinPath(): string | undefined {
-  const rootDirectory = findRoot() ?? process.cwd();
-  const prebuilt = path.join(rootDirectory, 'bin', process.platform, process.arch, `chdman${process.platform === 'win32' ? '.exe' : ''}`);
-  if (fs.existsSync(prebuilt)) {
-    return prebuilt;
+async function getBinPath(): Promise<string | undefined> {
+  if (CHDMAN_BIN) {
+    return CHDMAN_BIN;
   }
 
-  const resolved = which.sync('chdman', { nothrow: true });
+  const resolved = await which('chdman', { nothrow: true });
   if (resolved) {
+    CHDMAN_BIN = resolved;
     return resolved;
+  }
+
+  const rootDirectory = await findRoot() ?? process.cwd();
+  const prebuilt = path.join(rootDirectory, 'bin', process.platform, process.arch, `chdman${process.platform === 'win32' ? '.exe' : ''}`);
+  if (await util.promisify(fs.exists)(prebuilt)) {
+    CHDMAN_BIN = prebuilt;
+    return prebuilt;
   }
 
   return undefined;
 }
-
-const CHDMAN_BIN = getBinPath();
 
 interface ChdmanInfo {
   inputFile: string,
@@ -72,7 +78,8 @@ export default {
    * Run chdman with some arguments.
    */
   async run(arguments_: string[]): Promise<string> {
-    if (!CHDMAN_BIN) {
+    const chdmanBin = await getBinPath();
+    if (!chdmanBin) {
       throw new Error('chdman not found');
     }
 
@@ -82,7 +89,7 @@ export default {
     // }
 
     return new Promise<string>((resolve, reject) => {
-      const proc = child_process.spawn(CHDMAN_BIN, arguments_, { windowsHide: true });
+      const proc = child_process.spawn(chdmanBin, arguments_, { windowsHide: true });
       let killed = false;
 
       const chunks: Buffer[] = [];
