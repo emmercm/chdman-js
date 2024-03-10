@@ -210,6 +210,7 @@ jobs:
           merge-multiple: true
       - uses: actions/setup-node@v4
       - run: |
+          # shellcheck disable=SC2001
           package_name=$(jq --raw-output '.name' package.json)
           package_name=igir
           major_version=$(npm show "${package_name}" --json | jq --raw-output '.versions | .[]' | sed 's/\.[0-9]*//g' | sort | tail -1)
