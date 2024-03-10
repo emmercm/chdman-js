@@ -25,6 +25,11 @@ env:
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      # actions/checkout@v4
+      contents: read
+      # thollander/actions-comment-pull-request@v2
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
         with:
