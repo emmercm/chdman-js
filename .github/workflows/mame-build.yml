@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       mame_ref:
-        description: 'MAME GitHub ref, tag, or commit SHA (e.g. "mame0262")'
+        description: 'MAME GitHub branch, tag, or SHA (e.g. "mame0262")'
         required: true
         type: string
       auto-merge:
