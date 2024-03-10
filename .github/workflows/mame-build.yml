@@ -1,0 +1,244 @@
+name: MAME Build
+
+on:
+  push:
+  workflow_dispatch:
+    inputs:
+      mame_ref:
+        description: MAME GitHub Ref/Tag (e.g. "mame0262")
+        required: true
+        type: string
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+env:
+  MAME_REF: ${{ inputs.mame_ref || 'mame0262' }}
+  # `make` options
+  EMULATOR: 0
+  TOOLS: 1
+  TESTS: 0
+  IGNORE_GIT: 1
+  NOWERROR: 1
+  DEBUG: 0
+  SYMBOLS:
+  OPTIMIZE: s
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - apt_architecture: amd64
+            nodejs_arch: x64
+          - apt_architecture: i386
+            cc: i686-linux-gnu-gcc-11
+            cxx: i686-linux-gnu-g++-11
+            strip: i686-gnu-strip
+            nodejs_arch: ia32
+          - apt_architecture: armhf
+            cc: arm-linux-gnueabihf-gcc-11
+            cxx: arm-linux-gnueabihf-g++-11
+            archopts: -mfpu=neon
+            strip: arm-linux-gnueabihf-strip
+            nodejs_arch: arm
+          - apt_architecture: arm64
+            cc: aarch64-linux-gnu-gcc-11
+            cxx: aarch64-linux-gnu-g++-11
+            strip: aarch64-linux-gnu-strip
+            nodejs_arch: arm64
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: mamedev/mame
+          ref: ${{ env.MAME_REF }}
+      - name: Install dependencies
+        run: |
+          # https://docs.mamedev.org/initialsetup/compilingmame.html#debian-and-ubuntu-including-raspberry-pi-and-odroid-devices
+          sudo apt-get update
+          sudo apt-get install -y git build-essential python3 libsdl2-dev libsdl2-ttf-dev libfontconfig-dev libpulse-dev qtbase5-dev qtbase5-dev-tools qtchooser qt5-qmake \
+
+          sudo apt-get install -y software-properties-common
+          sudo dpkg --add-architecture i386
+          sudo add-apt-repository --yes --no-update "deb [arch=amd64,i386] http://archive.ubuntu.com/ubuntu/ $(lsb_release --codename | awk '{print $2}') main multiverse restricted universe"
+          sudo add-apt-repository --yes --no-update "deb [arch=amd64,i386] http://archive.ubuntu.com/ubuntu/ $(lsb_release --codename | awk '{print $2}')-updates main multiverse restricted universe"
+          sudo dpkg --add-architecture armhf
+          sudo dpkg --add-architecture arm64
+          sudo add-apt-repository --yes --no-update "deb [arch=armhf,arm64,ppc64el,riscv64,s390x] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release --codename | awk '{print $2}') main multiverse restricted universe"
+          sudo add-apt-repository --yes --no-update "deb [arch=armhf,arm64,ppc64el,riscv64,s390x] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release --codename | awk '{print $2}')-updates main multiverse restricted universe"
+          sudo apt-get update || true
+          sudo apt-get install -y crossbuild-essential-${{ matrix.apt_architecture }} libsdl2-dev:${{ matrix.apt_architecture }}
+      - name: Build
+        env:
+          OVERRIDE_CC: ${{ matrix.cc || 'gcc' }}
+          OVERRIDE_CXX: ${{ matrix.cxx || 'g++' }}
+          ARCHOPTS: -U_FORTIFY_SOURCE ${{ matrix.archopts }}
+          TARGETOS: linux
+        run: |
+          make -j$(nproc) -r
+          file chdman
+      - name: Strip binary
+        run: |
+          sudo apt-get install -y binutils binutils-i686-gnu binutils-arm-linux-gnueabihf binutils-aarch64-linux-gnu
+          ls -al chdman
+          ${{ matrix.strip || 'strip' }} chdman
+          ls -al chdman
+      - name: Rename binary
+        run: |
+          dir="artifacts/bin/linux/${{ matrix.nodejs_arch }}"
+          mkdir -p "${dir}"
+          mv chdman "${dir}/"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ runner.os }}-${{ matrix.apt_architecture }}-${{ github.sha }}
+          path: artifacts/**/chdman
+          if-no-files-found: error
+
+  # https://github.com/mamedev/mame/blob/4505d5459fed086d35f08d7572cb55cd661cd707/.github/workflows/ci-macos.yml
+  build-macos:
+    strategy:
+      matrix:
+        os: [macos-13, macos-14]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: mamedev/mame
+          ref: ${{ env.MAME_REF }}
+      - name: Install dependencies
+        run: brew install --overwrite python3 sdl2
+      - name: Build
+        env:
+          USE_LIBSDL: 1
+        run: |
+          make -j$(sysctl -n hw.physicalcpu) -r
+          file chdman
+      - name: Strip binary
+        run: |
+          ls -al chdman
+          strip chdman
+          ls -al chdman
+      - uses: actions/setup-node@v4
+      - name: Rename binary
+        run: |
+          dir="artifacts/bin/$(node --eval 'console.log(`${process.platform}/${process.arch}`)')"
+          mkdir -p "${dir}"
+          mv chdman "${dir}/"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ runner.os }}-${{ matrix.os }}-${{ github.sha }}
+          path: artifacts/**/chdman
+          if-no-files-found: error
+
+  # https://github.com/mamedev/mame/blob/4505d5459fed086d35f08d7572cb55cd661cd707/.github/workflows/ci-windows.yml
+  build-windows:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+    strategy:
+      matrix:
+        msystem: [mingw64, mingw32]
+        include:
+          - msystem: mingw64
+            nodejs_arch: x64
+          - msystem: mingw32
+            nodejs_arch: ia32
+          # - msystem: clangarm64
+          #   nodejs_arch: arm64
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: mamedev/mame
+          ref: ${{ env.MAME_REF }}
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: ${{ matrix.msystem }}
+          install: curl git make
+          pacboy: clang:p gcc:p libc++:p lld:p python:p llvm:p
+      - run: |
+          # https://docs.mamedev.org/initialsetup/compilingmame.html#using-a-standard-msys2-installation
+          if [[ "${{ matrix.msystem }}" == "mingw64" ]]; then
+            echo "MINGW64=/mingw64" >> "${GITHUB_ENV}"
+            echo "MINGW32=" >> "${GITHUB_ENV}"
+          elif [[ "${{ matrix.msystem }}" == "mingw32" ]]; then
+            echo "MINGW64=" >> "${GITHUB_ENV}"
+            echo "MINGW32=/mingw32" >> "${GITHUB_ENV}"
+          else
+            echo "MINGW64=" >> "${GITHUB_ENV}"
+            echo "MINGW32=" >> "${GITHUB_ENV}"
+          fi
+      - name: Build
+        env:
+          OVERRIDE_AR: "llvm-ar"
+          OVERRIDE_CC: clang
+          OVERRIDE_CXX: clang++
+          ARCHOPTS: "-fuse-ld=lld"
+        run: make -j$(nproc) -r
+      - name: Strip binary
+        run: |
+          ls -al chdman.exe
+          strip chdman.exe
+          ls -al chdman.exe
+      - name: Rename binary
+        run: |
+          dir="artifacts/bin/win32/${{ matrix.nodejs_arch }}"
+          mkdir -p "${dir}"
+          mv chdman.exe "${dir}/"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ runner.os }}-${{ matrix.msystem }}-${{ github.sha }}
+          path: artifacts/**/chdman.exe
+          if-no-files-found: error
+
+  git-update:
+    needs:
+      - build-linux
+      - build-macos
+      - build-windows
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+      - uses: actions/setup-node@v4
+      - run: |
+          package_name=$(jq --raw-output '.name' package.json)
+          package_name=igir
+          major_version=$(npm show "${package_name}" --json | jq --raw-output '.versions | .[]' | sed 's/\.[0-9]*//g' | sort | tail -1)
+          minor_version=$(echo "${MAME_REF}" | sed 's/[^0-9]*//g' | sed 's/^0*//')
+          previous_version=$(npm show "${package_name}" --json | jq --raw-output '.versions | .[]' | grep "${minor_version}" | tail -1)
+          if [[ "${previous_version}" != "" ]]; then
+            new_patch_version=$(echo "$(echo "${previous_version}" | sed 's/[0-9]*\.//g') + 1" | bc)
+            new_version="${major_version}.${minor_version}.${new_patch_version}"
+          else
+            new_version="${major_version}.${minor_version}.0"
+          fi
+          npm version "${new_version}" --no-git-tag-version || true
+      - run: |
+          chmod +x bin/**/*
+          ls -alR
+          git add package*.json bin
+
+          USER_EMAIL="${GITHUB_ACTOR_ID}+${GITHUB_ACTOR}@users.noreply.github.com"
+          echo "USER_EMAIL=${USER_EMAIL}" >> "${GITHUB_OUTPUT}"
+          git config --global user.email "${USER_EMAIL}"
+
+          USER_NAME="$(gh api "/users/${GITHUB_ACTOR}" | jq .name -r)"
+          echo "USER_NAME=${USER_NAME}" >> "${GITHUB_OUTPUT}"
+          git config --global user.name "${USER_NAME}"
+
+          PACKAGE_VERSION="$(jq --raw-output '.version' package.json)"
+          echo "PACKAGE_VERSION=${PACKAGE_VERSION}" >> "${GITHUB_OUTPUT}"
+          git commit -m "v${PACKAGE_VERSION}"
+
+          git push
+        env:
+          GH_TOKEN: ${{ github.token }}
