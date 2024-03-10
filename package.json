@@ -3,7 +3,9 @@
   "version": "0.262.0",
   "description": "💿 chdman binaries and wrapper for Node.js.",
   "keywords": [
-    "chdman"
+    "chdman",
+    "mame",
+    "roms"
   ],
   "homepage": "https://github.com/emmercm/chdman-js#readme",
   "bugs": {
