@@ -1,0 +1,88 @@
+name: Node.js Test
+
+on:
+  pull_request:
+    types:
+      # - edited  # PR's base branch was changed
+      - opened
+      - reopened
+      - synchronize  # PR's branch was edited (i.e. new commits)
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  path-filter:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    outputs:
+      changes: ${{ steps.filter.outputs.changes }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: filter
+        uses: dorny/paths-filter@v2
+        with:
+          filters: |
+            changes:
+              - '.github/workflows/node-test.yml'
+              - 'bin/**'
+              - 'src/**'
+              - 'test/**'
+              - '*'
+
+  node-lint:
+    needs:
+      - path-filter
+    if: ${{ needs.path-filter.outputs.changes == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      # Setup and install
+      - uses: actions/checkout@v4
+      - uses: volta-cli/action@v4
+      - run: npm ci
+      # Lint the source files
+      - run: npm start -- --help
+      - run: npm run lint
+
+  node-test:
+    needs:
+      - path-filter
+    if: ${{ needs.path-filter.outputs.changes == 'true' }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, macos-13, macos-14, windows-latest ]
+        node-version: [ lts, 16.6.0 ]
+    steps:
+      # Setup and install
+      - uses: actions/checkout@v4
+      - uses: volta-cli/action@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm ci
+      - if: ${{ startsWith(matrix.os, 'ubuntu') }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libsdl2-2.0-0 libsdl2-ttf-2.0-0
+      - if: ${{ startsWith(matrix.os, 'macos') }}
+        run: brew install --overwrite sdl2
+      # Test the source files
+      - run: npm run test:unit
+      # Test building
+      - run: npm run build
+
+  # !!! This check should be required by GitHub !!!
+  test-status-check:
+    if: always()
+    needs:
+      - path-filter
+      - node-lint
+      - node-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: re-actors/alls-green@release/v1
+        with:
+          allowed-skips: node-lint, node-test
+          jobs: ${{ toJSON(needs) }}
