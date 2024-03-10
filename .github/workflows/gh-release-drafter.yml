@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
     inputs:
       ref:
-        description: 'Git ref or SHA'
+        description: 'Git ref, tag, or commit SHA'
         required: true
         type: string
 
@@ -46,7 +46,7 @@ jobs:
           #   commit ref info that's needed for it.
           diff-search: ${{ github.event_name != 'workflow_dispatch' && true || false }}
           static-checking: ${{ github.event_name == 'workflow_dispatch' && 'localIsNew' || '' }}
-          file-url: ${{ github.event_name == 'workflow_dispatch' && 'https://unpkg.com/chdman-js/package.json' || '' }}
+          file-url: ${{ github.event_name == 'workflow_dispatch' && 'https://unpkg.com/chdman/package.json' || '' }}
 
       - if: steps.check.outputs.changed == 'true'
         uses: volta-cli/action@v4
