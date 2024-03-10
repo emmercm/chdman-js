@@ -1,6 +1,6 @@
 {
   "name": "chdman",
-  "version": "0.262.0",
+  "version": "0.262.1",
   "description": "💿 chdman binaries and wrapper for Node.js.",
   "keywords": [
     "chdman",
@@ -43,7 +43,8 @@
     "test:handles": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --verbose --detectOpenHandles",
     "bump:major": "npm version major --no-git-tag-version",
     "bump:minor": "npm version minor --no-git-tag-version",
-    "bump:patch": "npm version patch --no-git-tag-version"
+    "bump:patch": "npm version patch --no-git-tag-version",
+    "prepack": "npm run build"
   },
   "dependencies": {
     "which": "^4.0.0"
