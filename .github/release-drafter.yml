@@ -1,0 +1,10 @@
+template: |
+  # Release Highlights
+
+  ### First major change
+
+  ### Second major change
+
+  ## All changes
+
+  $CHANGES

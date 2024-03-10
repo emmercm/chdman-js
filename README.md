@@ -17,7 +17,7 @@
 | [macOS](./bin/darwin)  | • arm64 (Apple Silicon)<br>• x64 (Intel)             | [SDL2](https://www.libsdl.org/) is required to be installed separately:<br><pre>brew install sdl2</pre> |
 | [Linux](./bin/linux)   | • x64<br>• x86<br>• arm (armhf)<br>• arm64 (aarch64) |                                                                                                         |
 
-And `chdman` that exists on your `$PATH` will be preferred over the bundled binaries. This lets you control the build that is right for your machine.
+Any `chdman` that exists on your `$PATH` will be preferred over the bundled binaries. This lets you control the build that is right for your machine.
 
 ## Installation
 
