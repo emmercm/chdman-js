@@ -30,13 +30,17 @@ npm install --save chdman
 ```javascript
 import chdman from 'chdman';
 
-/** Create and extract CD-ROMs */
+/**
+ * Create and extract CD-ROMs
+ */
 await chdman.createCd('Original.cue', 'Disc.chd');
 console.log(await chdman.info('Disc.chd'));
 // { inputFile: 'Disc.chd', fileVersion: 5, ... }
 await chdman.extractCd('Disc.chd', 'Extracted.cue');
 
-/** Create and extract hard disks */
+/**
+ * Create and extract hard disks
+ */
 await chdman.createHd('original-image', 'image.chd');
 console.log(await chdman.info('image.chd'));
 // { inputFile: 'image.chd', fileVersion: 5, ... }
