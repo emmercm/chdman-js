@@ -27,6 +27,11 @@
   },
 
   "rules": {
+    // ***** Files *****
+    "unicorn/filename-case": ["error", {
+      "case": "camelCase"
+    }],
+
     // ***** Imports *****
     "@typescript-eslint/no-restricted-imports": ["error", {
       "paths": [{
