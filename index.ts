@@ -3,7 +3,6 @@ import ChdmanBin from './src/chdman/chdmanBin.js';
 import ChdmanHd from './src/chdman/chdmanHd.js';
 import ChdmanCd from './src/chdman/chdmanCd.js';
 import ChdmanVerify from './src/chdman/chdmanVerify.js';
-import ChdmanDvd from "./src/chdman/chdmanDvd.js";
 
 export default {
   run: ChdmanBin.run,
