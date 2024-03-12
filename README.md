@@ -1,4 +1,4 @@
-<h1 align="center">💿️ chdman-js</h1>
+<h1 align="center">💿️ chdman</h1>
 
 <p align="center"><b>Pre-compiled binaries and Node.js wrapper for MAME's <a href="https://docs.mamedev.org/tools/chdman.html">chdman</a> tool.</b></p>
 
@@ -33,16 +33,29 @@ import chdman from 'chdman';
 /**
  * Create and extract CD-ROMs
  */
-await chdman.createCd('Original.cue', 'Disc.chd');
+await chdman.createCd({
+  inputFilename: 'Original.cue',
+  outputFilename: 'Disc.chd',
+});
 console.log(await chdman.info('Disc.chd'));
 // { inputFile: 'Disc.chd', fileVersion: 5, ... }
-await chdman.extractCd('Disc.chd', 'Extracted.cue');
+await chdman.extractCd({
+  inputFilename: 'Disc.chd',
+  outputFilename: 'Extracted.cue',
+  outputBinFilename: 'Extracted.bin',
+});
 
 /**
  * Create and extract hard disks
  */
-await chdman.createHd('original-image', 'image.chd');
+await chdman.createHd({
+  inputFilename: 'original-image',
+  outputFilename: 'image.chd',
+});
 console.log(await chdman.info('image.chd'));
 // { inputFile: 'image.chd', fileVersion: 5, ... }
-await chdman.extractHd('image.chd', 'extracted-image');
+await chdman.extractHd({
+  inputFilename: 'image.chd',
+  outputFilename: 'extracted-image',
+});
 ```
