@@ -6,6 +6,8 @@ import ChdmanHd from '../../src/chdman/chdmanHd.js';
 import ChdmanInfo from '../../src/chdman/chdmanInfo.js';
 import TestUtil from '../testUtil.js';
 
+// https://unix.stackexchange.com/a/33634
+
 test('should fail on nonexistent file', async () => {
   const temporaryChd = `${await TestUtil.mktemp(path.join(os.tmpdir(), 'dummy'))}.chd`;
   const temporaryHd = `${await TestUtil.mktemp(path.join(os.tmpdir(), 'dummy'))}.hd`;
@@ -14,14 +16,14 @@ test('should fail on nonexistent file', async () => {
     await expect(ChdmanHd.createHd({
       inputFilename: os.devNull,
       outputFilename: temporaryChd,
-    })).rejects.toBeTruthy();
+    })).rejects.toBeDefined();
     await expect(ChdmanInfo.info({
       inputFilename: temporaryHd,
-    })).rejects.toBeTruthy();
+    })).rejects.toBeDefined();
     await expect(ChdmanHd.extractHd({
       inputFilename: temporaryChd,
       outputFilename: temporaryHd,
-    })).rejects.toBeTruthy();
+    })).rejects.toBeDefined();
   } finally {
     await util.promisify(fs.rm)(temporaryChd, { force: true });
   }
