@@ -43,7 +43,6 @@ jobs:
       - uses: volta-cli/action@v4
       - run: npm ci
       # Lint the source files
-      - run: npm start -- --help
       - run: npm run lint
 
   node-test:
