@@ -31,21 +31,6 @@ npm install --save chdman
 import chdman from 'chdman';
 
 /**
- * Create and extract CD-ROMs
- */
-await chdman.createCd({
-  inputFilename: 'Original.cue',
-  outputFilename: 'Disc.chd',
-});
-console.log(await chdman.info('Disc.chd'));
-// { inputFile: 'Disc.chd', fileVersion: 5, ... }
-await chdman.extractCd({
-  inputFilename: 'Disc.chd',
-  outputFilename: 'Extracted.cue',
-  outputBinFilename: 'Extracted.bin',
-});
-
-/**
  * Create and extract hard disks
  */
 await chdman.createHd({
@@ -57,5 +42,34 @@ console.log(await chdman.info('image.chd'));
 await chdman.extractHd({
   inputFilename: 'image.chd',
   outputFilename: 'extracted-image',
+});
+
+/**
+ * Create and extract CD-ROMs
+ */
+await chdman.createCd({
+  inputFilename: 'Original.cue',
+  outputFilename: 'CD.chd',
+});
+console.log(await chdman.info('CD.chd'));
+// { inputFile: 'CD.chd', fileVersion: 5, ... }
+await chdman.extractCd({
+  inputFilename: 'CD.chd',
+  outputFilename: 'Extracted.cue',
+  outputBinFilename: 'Extracted.bin',
+});
+
+/**
+ * Create and extract DVD-ROMs
+ */
+await chdman.createDvd({
+  inputFilename: 'Original.iso',
+  outputFilename: 'DVD.chd',
+});
+console.log(await chdman.info('DVD.chd'));
+// { inputFile: 'DVD.chd', fileVersion: 5, ... }
+await chdman.extractDvd({
+  inputFilename: 'DVD.chd',
+  outputFilename: 'Extracted.iso',
 });
 ```
