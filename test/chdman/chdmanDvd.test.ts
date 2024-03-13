@@ -2,27 +2,28 @@ import path from 'node:path';
 import os from 'node:os';
 import util from 'node:util';
 import fs from 'node:fs';
-import ChdmanHd from '../../src/chdman/chdmanHd.js';
+import crypto from 'node:crypto';
 import ChdmanInfo from '../../src/chdman/chdmanInfo.js';
 import TestUtil from '../testUtil.js';
+import ChdmanDvd from '../../src/chdman/chdmanDvd.js';
 
 // https://unix.stackexchange.com/a/33634
 
 test('should fail on nonexistent file', async () => {
   const temporaryChd = `${await TestUtil.mktemp(path.join(os.tmpdir(), 'dummy'))}.chd`;
-  const temporaryHd = `${await TestUtil.mktemp(path.join(os.tmpdir(), 'dummy'))}.hd`;
+  const temporaryIso = `${await TestUtil.mktemp(path.join(os.tmpdir(), 'dummy'))}.iso`;
 
   try {
-    await expect(ChdmanHd.createHd({
+    await expect(ChdmanDvd.createDvd({
       inputFilename: os.devNull,
       outputFilename: temporaryChd,
     })).rejects.toBeDefined();
     await expect(ChdmanInfo.info({
-      inputFilename: temporaryHd,
+      inputFilename: temporaryIso,
     })).rejects.toBeDefined();
-    await expect(ChdmanHd.extractHd({
+    await expect(ChdmanDvd.createDvd({
       inputFilename: temporaryChd,
-      outputFilename: temporaryHd,
+      outputFilename: temporaryIso,
     })).rejects.toBeDefined();
   } finally {
     await util.promisify(fs.rm)(temporaryChd, { force: true });
@@ -30,16 +31,15 @@ test('should fail on nonexistent file', async () => {
 });
 
 test.each([
-  [path.join('test', 'fixtures', 'hd', '512.hd'), Math.ceil(512 / 2048) * 2048],
-  [path.join('test', 'fixtures', 'hd', '3584.hd'), Math.ceil(3584 / 2048) * 2048],
-  [path.join('test', 'fixtures', 'iso', '2048.iso'), 2048],
-])('should create, info, and extract: %s', async (hd, expectedBinSize) => {
-  const temporaryChd = `${await TestUtil.mktemp(path.join(os.tmpdir(), path.basename(hd)))}.chd`;
-  const temporaryHd = `${await TestUtil.mktemp(path.join(os.tmpdir(), 'dummy'))}.hd`;
+  [path.join('test', 'fixtures', 'iso', '2048.iso')],
+  [path.join('test', 'fixtures', 'iso', '16384.iso')],
+])('should create, info, and extract: %s', async (iso) => {
+  const temporaryChd = `${await TestUtil.mktemp(path.join(os.tmpdir(), path.basename(iso)))}.chd`;
+  const temporaryIso = `${await TestUtil.mktemp(path.join(os.tmpdir(), 'dummy'))}.hd`;
 
   try {
-    await ChdmanHd.createHd({
-      inputFilename: hd,
+    await ChdmanDvd.createDvd({
+      inputFilename: iso,
       outputFilename: temporaryChd,
     });
     await expect(TestUtil.exists(temporaryChd)).resolves.toEqual(true);
@@ -59,15 +59,15 @@ test.each([
     expect(info.sha1).toBeTruthy();
     expect(info.dataSha1).toBeTruthy();
 
-    await ChdmanHd.extractHd({
+    await ChdmanDvd.extractDvd({
       inputFilename: temporaryChd,
-      outputFilename: temporaryHd,
+      outputFilename: temporaryIso,
     });
-    await expect(TestUtil.exists(temporaryHd)).resolves.toEqual(true);
-    const temporaryHdStat = await util.promisify(fs.stat)(temporaryHd);
-    expect(temporaryHdStat.size).toEqual(expectedBinSize);
+    await expect(TestUtil.exists(temporaryIso)).resolves.toEqual(true);
+    expect(crypto.createHash('sha1').update(await util.promisify(fs.readFile)(iso)).digest('hex'))
+      .toEqual(crypto.createHash('sha1').update(await util.promisify(fs.readFile)(temporaryIso)).digest('hex'));
   } finally {
     await util.promisify(fs.rm)(temporaryChd, { force: true });
-    await util.promisify(fs.rm)(temporaryHd, { force: true });
+    await util.promisify(fs.rm)(temporaryIso, { force: true });
   }
 });

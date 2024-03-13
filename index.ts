@@ -3,6 +3,7 @@ import ChdmanBin from './src/chdman/chdmanBin.js';
 import ChdmanHd from './src/chdman/chdmanHd.js';
 import ChdmanCd from './src/chdman/chdmanCd.js';
 import ChdmanVerify from './src/chdman/chdmanVerify.js';
+import ChdmanDvd from './src/chdman/chdmanDvd.js';
 
 export default {
   run: ChdmanBin.run,
@@ -14,53 +15,13 @@ export default {
   // TODO(cemmer): createraw
   createHd: ChdmanHd.createHd,
   createCd: ChdmanCd.createCd,
-  // TODO(cemmer): createdvd
+  createDvd: ChdmanDvd.createDvd,
   // TODO(cemmer): createld
-
-  /**
-   * Automatically extract a CHD.
-   */
-  async extract(inputChdFilename: string, outputFilename: string): Promise<string> {
-    const info = await this.info({ inputFilename: inputChdFilename });
-    const metadataTags = new Set(info.metadata
-      .map((metadata) => metadata.tag));
-
-    if (metadataTags.has('GDDD')) {
-      await this.extractHd({
-        inputFilename: inputChdFilename,
-        outputFilename,
-      });
-      return outputFilename;
-    }
-
-    if (metadataTags.has('CHCD') || metadataTags.has('CHTR') || metadataTags.has('CHT2')) {
-      // CD-ROMs
-      const outputCue = `${outputFilename}.cue`;
-      const outputBin = `${outputFilename}.bin`;
-      await this.extractCd({
-        inputFilename: inputChdFilename,
-        outputFilename: outputCue,
-        outputBinFilename: outputBin,
-      });
-      return outputCue;
-    }
-    if (metadataTags.has('CHGT') || metadataTags.has('CHGD')) {
-      // Dreamcast GD-ROM
-      const outputGdi = `${outputFilename}.gdi`;
-      await this.extractCd({
-        inputFilename: inputChdFilename,
-        outputFilename: outputGdi,
-      });
-      return outputGdi;
-    }
-
-    throw new Error('couldn\'t automatically detect CHD data type');
-  },
 
   // TODO(cemmer): extractraw
   extractHd: ChdmanHd.extractHd,
   extractCd: ChdmanCd.extractCd,
-  // TODO(cemmer): extractdvd
+  extractDvd: ChdmanDvd.extractDvd,
   // TODO(cemmer): extractld
 
   // TODO(cemmer): copy
