@@ -1,5 +1,5 @@
 // https://docs.mamedev.org/tools/chdman.html#compression-algorithms
-enum CompressionAlgorithm {
+export enum CompressionAlgorithm {
   ZLIB = 'zlib',
   ZSTANDARD = 'zstd',
   LZMA = 'lzma',
@@ -12,4 +12,11 @@ enum CompressionAlgorithm {
   HUFFMAN_AV = 'avhu',
 }
 
-export default CompressionAlgorithm;
+export enum CHDType {
+  RAW = 1,
+  HARD_DISK,
+  CD_ROM,
+  DVD_ROM,
+  // LASER_DISC,
+  UNKNOWN,
+}

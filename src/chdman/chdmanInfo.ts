@@ -1,13 +1,14 @@
 import util from 'node:util';
 import fs from 'node:fs';
 import ChdmanBin from './chdmanBin.js';
-import CompressionAlgorithm from './common.js';
+import { CHDType, CompressionAlgorithm } from './common.js';
 
 export interface InfoOptions {
   inputFilename: string,
 }
 
 export interface Info {
+  // CLI output
   inputFile: string,
   fileVersion: number,
   logicalSize: number,
@@ -21,6 +22,8 @@ export interface Info {
   sha1: string,
   dataSha1: string,
   metadata: Metadata[],
+  // Derived output
+  type: CHDType,
 }
 
 export interface Metadata {
@@ -72,6 +75,19 @@ export default {
         } satisfies Metadata;
       });
 
+    const metadataTags = new Set(metadata.map((m) => m.tag));
+    let type = CHDType.UNKNOWN;
+    if (metadataTags.has('GDDD')) {
+      type = CHDType.HARD_DISK;
+    } else if (metadataTags.has('CHCD') || metadataTags.has('CHTR') || metadataTags.has('CHT2')) {
+      type = CHDType.CD_ROM;
+    } else if (metadataTags.has('CHGT') || metadataTags.has('CHGD')) {
+      // Dreamcast GD_ROM
+      type = CHDType.CD_ROM;
+    } else if (metadataTags.has('DVD')) {
+      type = CHDType.DVD_ROM;
+    }
+
     return {
       inputFile: parsedKeys.get('INPUT FILE') ?? options.inputFilename,
       fileVersion: Number.parseInt(parsedKeys.get('FILE VERSION') ?? '0', 10),
@@ -82,15 +98,16 @@ export default {
       totalUnits: Number.parseInt(parsedKeys.get('TOTAL UNITS')?.replace(/\D+/g, '') ?? '0', 10),
       compression: [...(parsedKeys.get('COMPRESSION') ?? '').matchAll(/([a-z]{4})( \([^(]+\))?/g)]
         .map((match) => match[1])
-        .map((type) => Object.keys(CompressionAlgorithm)
+        .map((compressionType) => Object.keys(CompressionAlgorithm)
           .map((enumKey) => CompressionAlgorithm[enumKey as keyof typeof CompressionAlgorithm])
-          .find((enumValue) => enumValue === type))
+          .find((enumValue) => enumValue === compressionType))
         .filter((enumValue): enumValue is CompressionAlgorithm => enumValue !== undefined),
       chdSize: Number.parseInt(parsedKeys.get('CHD SIZE')?.replace(/\D+/g, '') ?? '0', 10),
       ratio: Number.parseFloat(parsedKeys.get('RATIO')?.replace(/[^\d.]+/g, '') ?? '0'),
       sha1: parsedKeys.get('SHA1') ?? '',
       dataSha1: parsedKeys.get('DATA SHA1') ?? '',
       metadata,
+      type,
     } satisfies Info;
   },
 };
