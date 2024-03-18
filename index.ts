@@ -5,6 +5,14 @@ import ChdmanCd from './src/chdman/chdmanCd.js';
 import ChdmanVerify from './src/chdman/chdmanVerify.js';
 import ChdmanDvd from './src/chdman/chdmanDvd.js';
 
+export * from './src/chdman/chdmanInfo.js';
+export * from './src/chdman/chdmanBin.js';
+export * from './src/chdman/chdmanHd.js';
+export * from './src/chdman/chdmanCd.js';
+export * from './src/chdman/chdmanVerify.js';
+export * from './src/chdman/chdmanDvd.js';
+export * from './src/chdman/common.js';
+
 export default {
   run: ChdmanBin.run,
 
