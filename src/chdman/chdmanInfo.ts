@@ -99,7 +99,10 @@ export default {
       compression: [...(parsedKeys.get('COMPRESSION') ?? '').matchAll(/([a-z]{4})( \([^(]+\))?/g)]
         .map((match) => match[1])
         .map((compressionType) => Object.keys(CHDCompressionAlgorithm)
-          .map((enumKey) => CHDCompressionAlgorithm[enumKey as keyof typeof CHDCompressionAlgorithm])
+          .map((enumKey) => {
+            const compressionAlgo = enumKey as keyof typeof CHDCompressionAlgorithm;
+            return CHDCompressionAlgorithm[compressionAlgo];
+          })
           .find((enumValue) => enumValue === compressionType))
         .filter((enumValue): enumValue is CHDCompressionAlgorithm => enumValue !== undefined),
       chdSize: Number.parseInt(parsedKeys.get('CHD SIZE')?.replace(/\D+/g, '') ?? '0', 10),
