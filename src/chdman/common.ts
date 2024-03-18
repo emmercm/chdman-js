@@ -1,5 +1,5 @@
 // https://docs.mamedev.org/tools/chdman.html#compression-algorithms
-export enum CompressionAlgorithm {
+export enum CHDCompressionAlgorithm {
   ZLIB = 'zlib',
   ZSTANDARD = 'zstd',
   LZMA = 'lzma',

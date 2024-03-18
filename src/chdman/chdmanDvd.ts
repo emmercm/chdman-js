@@ -1,14 +1,14 @@
 import util from 'node:util';
 import fs from 'node:fs';
 import ChdmanBin from './chdmanBin.js';
-import { CompressionAlgorithm } from './common.js';
+import { CHDCompressionAlgorithm } from './common.js';
 
 export interface CreateDvdOptions {
   outputFilename: string,
   outputParentFilename?: string,
   force?: boolean,
   inputFilename: string,
-  compression?: 'none' | CompressionAlgorithm[],
+  compression?: 'none' | CHDCompressionAlgorithm[],
   numProcessors?: number
 }
 

@@ -1,7 +1,7 @@
 import util from 'node:util';
 import fs from 'node:fs';
 import ChdmanBin from './chdmanBin.js';
-import { CompressionAlgorithm } from './common.js';
+import { CHDCompressionAlgorithm } from './common.js';
 
 export interface CreateHdOptions {
   outputFilename: string,
@@ -13,7 +13,7 @@ export interface CreateHdOptions {
   inputBytes?: number,
   inputHunks?: number,
   hunkSize?: number,
-  compression?: 'none' | CompressionAlgorithm[],
+  compression?: 'none' | CHDCompressionAlgorithm[],
   template?: number,
   identFilename?: string,
   cylindersHeadsSectors?: string,

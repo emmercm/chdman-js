@@ -44,6 +44,7 @@ await chdman.extractHd({
   outputFilename: 'extracted-image',
 });
 
+
 /**
  * Create and extract CD-ROMs
  */
@@ -58,6 +59,7 @@ await chdman.extractCd({
   outputFilename: 'Extracted.cue',
   outputBinFilename: 'Extracted.bin',
 });
+
 
 /**
  * Create and extract DVD-ROMs

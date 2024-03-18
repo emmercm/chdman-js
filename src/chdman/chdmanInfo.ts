@@ -1,13 +1,13 @@
 import util from 'node:util';
 import fs from 'node:fs';
 import ChdmanBin from './chdmanBin.js';
-import { CHDType, CompressionAlgorithm } from './common.js';
+import { CHDType, CHDCompressionAlgorithm } from './common.js';
 
 export interface InfoOptions {
   inputFilename: string,
 }
 
-export interface Info {
+export interface CHDInfo {
   // CLI output
   inputFile: string,
   fileVersion: number,
@@ -16,17 +16,17 @@ export interface Info {
   totalHunks: number,
   unitSize: number,
   totalUnits: number,
-  compression: CompressionAlgorithm[],
+  compression: CHDCompressionAlgorithm[],
   chdSize: number,
   ratio: number,
   sha1: string,
   dataSha1: string,
-  metadata: Metadata[],
+  metadata: CHDMetadata[],
   // Derived output
   type: CHDType,
 }
 
-export interface Metadata {
+export interface CHDMetadata {
   tag: string,
   index: number,
   length: number,
@@ -37,7 +37,7 @@ export default {
   /**
    * Return info about a CHD file.
    */
-  async info(options: InfoOptions): Promise<Info> {
+  async info(options: InfoOptions): Promise<CHDInfo> {
     if (!await util.promisify(fs.exists)(options.inputFilename)) {
       throw new Error(`input file doesn't exist: ${options.inputFilename}`);
     }
@@ -72,7 +72,7 @@ export default {
           index,
           length,
           data: match[2],
-        } satisfies Metadata;
+        } satisfies CHDMetadata;
       });
 
     const metadataTags = new Set(metadata.map((m) => m.tag));
@@ -98,16 +98,16 @@ export default {
       totalUnits: Number.parseInt(parsedKeys.get('TOTAL UNITS')?.replace(/\D+/g, '') ?? '0', 10),
       compression: [...(parsedKeys.get('COMPRESSION') ?? '').matchAll(/([a-z]{4})( \([^(]+\))?/g)]
         .map((match) => match[1])
-        .map((compressionType) => Object.keys(CompressionAlgorithm)
-          .map((enumKey) => CompressionAlgorithm[enumKey as keyof typeof CompressionAlgorithm])
+        .map((compressionType) => Object.keys(CHDCompressionAlgorithm)
+          .map((enumKey) => CHDCompressionAlgorithm[enumKey as keyof typeof CHDCompressionAlgorithm])
           .find((enumValue) => enumValue === compressionType))
-        .filter((enumValue): enumValue is CompressionAlgorithm => enumValue !== undefined),
+        .filter((enumValue): enumValue is CHDCompressionAlgorithm => enumValue !== undefined),
       chdSize: Number.parseInt(parsedKeys.get('CHD SIZE')?.replace(/\D+/g, '') ?? '0', 10),
       ratio: Number.parseFloat(parsedKeys.get('RATIO')?.replace(/[^\d.]+/g, '') ?? '0'),
       sha1: parsedKeys.get('SHA1') ?? '',
       dataSha1: parsedKeys.get('DATA SHA1') ?? '',
       metadata,
       type,
-    } satisfies Info;
+    } satisfies CHDInfo;
   },
 };

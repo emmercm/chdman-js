@@ -1,7 +1,7 @@
 import util from 'node:util';
 import fs from 'node:fs';
 import ChdmanBin from './chdmanBin.js';
-import { CompressionAlgorithm } from './common.js';
+import { CHDCompressionAlgorithm } from './common.js';
 
 export interface CreateCdOptions {
   outputFilename: string,
@@ -9,7 +9,7 @@ export interface CreateCdOptions {
   force?: boolean,
   inputFilename: string,
   hunkSize?: number,
-  compression?: 'none' | CompressionAlgorithm[],
+  compression?: 'none' | CHDCompressionAlgorithm[],
   numProcessors?: number
 }
 
