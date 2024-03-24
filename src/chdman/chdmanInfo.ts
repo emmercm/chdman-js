@@ -37,7 +37,7 @@ export default {
   /**
    * Return info about a CHD file.
    */
-  async info(options: InfoOptions): Promise<CHDInfo> {
+  async info(options: InfoOptions, attempt = 1): Promise<CHDInfo> {
     if (!await util.promisify(fs.exists)(options.inputFilename)) {
       throw new Error(`input file doesn't exist: ${options.inputFilename}`);
     }
@@ -87,7 +87,7 @@ export default {
       type = CHDType.DVD_ROM;
     }
 
-    return {
+    const chdInfo = {
       inputFile: parsedKeys.get('INPUT FILE') ?? options.inputFilename,
       fileVersion: Number.parseInt(parsedKeys.get('FILE VERSION') ?? '0', 10),
       logicalSize: Number.parseInt(parsedKeys.get('LOGICAL SIZE')?.replace(/\D+/g, '') ?? '0', 10),
@@ -111,5 +111,15 @@ export default {
       metadata,
       type,
     } satisfies CHDInfo;
+
+    // Try to detect failures, and then retry them automatically
+    if (chdInfo.fileVersion === 0 && attempt < 3) {
+      await new Promise((resolve) => {
+        setTimeout(resolve, Math.random() * (2 ** (attempt - 1) * 10));
+      });
+      return this.info(options, attempt + 1);
+    }
+
+    return chdInfo;
   },
 };
