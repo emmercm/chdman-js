@@ -16,6 +16,7 @@ export enum CHDType {
   RAW = 1,
   HARD_DISK,
   CD_ROM,
+  GD_ROM,
   DVD_ROM,
   // LASER_DISC,
   UNKNOWN,

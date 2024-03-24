@@ -82,8 +82,7 @@ export default {
     } else if (metadataTags.has('CHCD') || metadataTags.has('CHTR') || metadataTags.has('CHT2')) {
       type = CHDType.CD_ROM;
     } else if (metadataTags.has('CHGT') || metadataTags.has('CHGD')) {
-      // Dreamcast GD_ROM
-      type = CHDType.CD_ROM;
+      type = CHDType.GD_ROM;
     } else if (metadataTags.has('DVD')) {
       type = CHDType.DVD_ROM;
     }
