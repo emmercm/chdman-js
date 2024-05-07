@@ -41,6 +41,8 @@ test.each([
     await ChdmanHd.createHd({
       inputFilename: hd,
       outputFilename: temporaryChd,
+      // chdman v0.263 stopped producing valid CHDs for the fixtures with default settings
+      hunkSize: 512,
     });
     await expect(TestUtil.exists(temporaryChd)).resolves.toEqual(true);
 
