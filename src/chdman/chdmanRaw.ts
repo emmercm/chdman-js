@@ -2,6 +2,7 @@ import util from 'node:util';
 import fs from 'node:fs';
 import { CHDCompressionAlgorithm } from './common.js';
 import ChdmanBin from './chdmanBin.js';
+import ChdmanInfo from './chdmanInfo.js';
 
 export interface CreateRawOptions {
   outputFilename: string,
@@ -56,6 +57,15 @@ export default {
         await util.promisify(fs.rm)(options.outputFilename, { force: true });
       }
       throw error;
+    }
+
+    // Test the created file
+    try {
+      await ChdmanInfo.info({
+        inputFilename: options.outputFilename,
+      });
+    } catch (error) {
+      throw new Error(`created CHD is invalid: ${error}`);
     }
   },
 
