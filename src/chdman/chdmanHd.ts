@@ -61,7 +61,7 @@ export default {
         ...(options.size === undefined ? [] : ['--size', String(options.size)]),
         ...(options.sectorSize === undefined ? [] : ['--sectorsize', String(options.sectorSize)]),
         ...(options.numProcessors === undefined ? [] : ['--numprocessors', String(options.numProcessors)]),
-      ]);
+      ], { logStd: true });
     } catch (error) {
       // chdman can leave cruft when it fails
       if (!existedBefore) {
