@@ -5,6 +5,10 @@ import fs from 'node:fs';
 import url from 'node:url';
 import * as child_process from 'node:child_process';
 
+export interface ChdmanBinOptions {
+  logStd?: boolean
+}
+
 /**
  * Code to find and interact with the `chdman` binary.
  */
@@ -30,17 +34,17 @@ export default class ChdmanBin {
       return ChdmanBin.CHDMAN_BIN;
     }
 
-    const resolved = await which('chdman', { nothrow: true });
-    if (resolved) {
-      ChdmanBin.CHDMAN_BIN = resolved;
-      return resolved;
-    }
-
     const rootDirectory = await this.findRoot() ?? process.cwd();
     const prebuilt = path.join(rootDirectory, 'bin', process.platform, process.arch, `chdman${process.platform === 'win32' ? '.exe' : ''}`);
     if (await util.promisify(fs.exists)(prebuilt)) {
       ChdmanBin.CHDMAN_BIN = prebuilt;
       return prebuilt;
+    }
+
+    const resolved = await which('chdman', { nothrow: true });
+    if (resolved) {
+      ChdmanBin.CHDMAN_BIN = resolved;
+      return resolved;
     }
 
     return undefined;
@@ -49,7 +53,7 @@ export default class ChdmanBin {
   /**
    * Run chdman with some arguments.
    */
-  static async run(arguments_: string[]): Promise<string> {
+  static async run(arguments_: string[], options?: ChdmanBinOptions): Promise<string> {
     const chdmanBin = await ChdmanBin.getBinPath();
     if (!chdmanBin) {
       throw new Error('chdman not found');
@@ -65,10 +69,20 @@ export default class ChdmanBin {
       let killed = false;
 
       const chunks: Buffer[] = [];
+
       proc.stdout.on('data', (chunk) => {
+        if (options?.logStd) {
+          console.log(chunk.toString());
+        }
+
         chunks.push(chunk);
       });
+
       proc.stderr.on('data', (chunk) => {
+        if (options?.logStd) {
+          console.error(chunk.toString());
+        }
+
         chunks.push(chunk);
         if (chunk.toString().includes('nan% complete')) {
           // chdman can hang forever on input files that aren't valid (i.e. too small)
