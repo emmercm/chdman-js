@@ -30,17 +30,17 @@ export default class ChdmanBin {
       return ChdmanBin.CHDMAN_BIN;
     }
 
-    const resolved = await which('chdman', { nothrow: true });
-    if (resolved) {
-      ChdmanBin.CHDMAN_BIN = resolved;
-      return resolved;
-    }
-
     const rootDirectory = await this.findRoot() ?? process.cwd();
     const prebuilt = path.join(rootDirectory, 'bin', process.platform, process.arch, `chdman${process.platform === 'win32' ? '.exe' : ''}`);
     if (await util.promisify(fs.exists)(prebuilt)) {
       ChdmanBin.CHDMAN_BIN = prebuilt;
       return prebuilt;
+    }
+
+    const resolved = await which('chdman', { nothrow: true });
+    if (resolved) {
+      ChdmanBin.CHDMAN_BIN = resolved;
+      return resolved;
     }
 
     return undefined;
