@@ -5,10 +5,11 @@ import fs from 'node:fs';
 import ChdmanHd from '../../src/chdman/chdmanHd.js';
 import ChdmanInfo from '../../src/chdman/chdmanInfo.js';
 import TestUtil from '../testUtil.js';
+import { CHDType } from '../../src/chdman/common.js';
 
 // https://unix.stackexchange.com/a/33634
 
-test('should fail on nonexistent file', async () => {
+it('should fail on nonexistent file', async () => {
   const temporaryChd = `${await TestUtil.mktemp(path.join(os.tmpdir(), 'dummy'))}.chd`;
   const temporaryHd = `${await TestUtil.mktemp(path.join(os.tmpdir(), 'dummy'))}.hd`;
 
@@ -60,6 +61,7 @@ test.each([
     expect(info.ratio).toBeGreaterThan(0);
     expect(info.sha1).toBeTruthy();
     expect(info.dataSha1).toBeTruthy();
+    expect(info.type).toEqual(CHDType.HARD_DISK);
 
     await ChdmanHd.extractHd({
       inputFilename: temporaryChd,

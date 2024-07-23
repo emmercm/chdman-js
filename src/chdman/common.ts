@@ -19,5 +19,4 @@ export enum CHDType {
   GD_ROM,
   DVD_ROM,
   // LASER_DISC,
-  UNKNOWN,
 }

@@ -6,10 +6,11 @@ import crypto from 'node:crypto';
 import ChdmanInfo from '../../src/chdman/chdmanInfo.js';
 import TestUtil from '../testUtil.js';
 import ChdmanDvd from '../../src/chdman/chdmanDvd.js';
+import { CHDType } from '../../src/chdman/common.js';
 
 // https://unix.stackexchange.com/a/33634
 
-test('should fail on nonexistent file', async () => {
+it('should fail on nonexistent file', async () => {
   const temporaryChd = `${await TestUtil.mktemp(path.join(os.tmpdir(), 'dummy'))}.chd`;
   const temporaryIso = `${await TestUtil.mktemp(path.join(os.tmpdir(), 'dummy'))}.iso`;
 
@@ -58,6 +59,7 @@ test.each([
     expect(info.ratio).toBeGreaterThan(0);
     expect(info.sha1).toBeTruthy();
     expect(info.dataSha1).toBeTruthy();
+    expect(info.type).toEqual(CHDType.DVD_ROM);
 
     await ChdmanDvd.extractDvd({
       inputFilename: temporaryChd,

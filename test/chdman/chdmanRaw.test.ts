@@ -5,8 +5,9 @@ import fs from 'node:fs';
 import ChdmanInfo from '../../src/chdman/chdmanInfo.js';
 import TestUtil from '../testUtil.js';
 import ChdmanRaw from '../../src/chdman/chdmanRaw.js';
+import { CHDType } from '../../src/chdman/common.js';
 
-test('should fail on nonexistent file', async () => {
+it('should fail on nonexistent file', async () => {
   const temporaryChd = `${await TestUtil.mktemp(path.join(os.tmpdir(), 'dummy'))}.chd`;
   const temporaryRaw = `${await TestUtil.mktemp(path.join(os.tmpdir(), 'dummy'))}.hd`;
 
@@ -61,6 +62,7 @@ test.each([
     expect(info.ratio).toBeGreaterThan(0);
     expect(info.sha1).toBeTruthy();
     expect(info.dataSha1).toBeTruthy();
+    expect(info.type).toEqual(CHDType.RAW);
 
     await ChdmanRaw.extractRaw({
       inputFilename: temporaryChd,

@@ -5,8 +5,9 @@ import fs from 'node:fs';
 import ChdmanCd from '../../src/chdman/chdmanCd.js';
 import ChdmanInfo from '../../src/chdman/chdmanInfo.js';
 import TestUtil from '../testUtil.js';
+import { CHDType } from '../../src/chdman/common.js';
 
-test('should fail on nonexistent file', async () => {
+it('should fail on nonexistent file', async () => {
   const temporaryChd = `${await TestUtil.mktemp(path.join(os.tmpdir(), 'dummy'))}.chd`;
   const temporaryCue = `${temporaryChd}.cue`;
   const temporaryBin = `${temporaryChd}.bin`;
@@ -60,6 +61,7 @@ test.each([
     expect(info.ratio).toBeGreaterThan(0);
     expect(info.sha1).toBeTruthy();
     expect(info.dataSha1).toBeTruthy();
+    expect(info.type).toEqual(CHDType.CD_ROM);
 
     await ChdmanCd.extractCd({
       inputFilename: temporaryChd,
