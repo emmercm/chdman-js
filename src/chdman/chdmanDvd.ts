@@ -38,7 +38,7 @@ export default {
           ? []
           : ['--compression', Array.isArray(options.compression) ? options.compression.join(',') : options.compression]),
         ...(options.numProcessors === undefined ? [] : ['--numprocessors', String(options.numProcessors)]),
-      ], { logStd: true });
+      ]);
     } catch (error) {
       // chdman can leave cruft when it fails
       if (!existedBefore) {
