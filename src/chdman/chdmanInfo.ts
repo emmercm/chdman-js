@@ -56,7 +56,7 @@ export default {
       }
     }
 
-    const metadata = [...output.matchAll(/metadata: +(.+)\n +(.+)/gi)]
+    const metadata = [...output.matchAll(/metadata: +(.+)\r?\n +(.+)/gi)]
       .map((match, index_) => {
         const tag = match[1].match(/tag='([\d a-z]+)'/i)?.at(1)?.trim() ?? '';
         const index = Number.parseInt(
@@ -76,7 +76,7 @@ export default {
       });
 
     const metadataTags = new Set(metadata.map((m) => m.tag));
-    let type = CHDType.UNKNOWN;
+    let type = CHDType.RAW;
     if (metadataTags.has('GDDD')) {
       type = CHDType.HARD_DISK;
     } else if (metadataTags.has('CHCD') || metadataTags.has('CHTR') || metadataTags.has('CHT2')) {

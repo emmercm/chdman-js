@@ -1,6 +1,6 @@
 import ChdmanBin from '../../src/chdman/chdmanBin.js';
 
-test('should print the help message', async () => {
+it('should print the help message', async () => {
   try {
     await ChdmanBin.run(['help']);
   } catch (error) {
