@@ -23,6 +23,9 @@
     "bin"
   ],
   "main": "dist/index.js",
+  "bin": {
+    "chdman": "dist/src/bin.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/emmercm/chdman-js.git"
@@ -32,7 +35,7 @@
     "provenance": true
   },
   "scripts": {
-    "start": "node --loader ts-node/esm index.ts",
+    "start": "node --loader ts-node/esm src/bin.ts",
     "build": "tsc && node --eval \"if(process.platform!=='win32'){process.exit(1);}\" || chmod +x dist/index.js",
     "package": "npm run build",
     "lint": "eslint .",

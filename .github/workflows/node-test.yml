@@ -67,10 +67,33 @@ jobs:
           sudo apt-get install -y libsdl2-2.0-0 libsdl2-ttf-2.0-0
       - if: ${{ startsWith(matrix.os, 'macos') }}
         run: brew install --overwrite sdl2
+
       # Test the source files
       - run: npm run test:unit
+
       # Test building
       - run: npm run build
+
+      # Test running
+      - run: |
+          npm start -- help
+          npm start -- createcd --input test/fixtures/cue/multiple.cue --output multiple.chd --hunksize 14688
+          npm start -- info --input multiple.chd
+
+  node-e2e:
+    needs:
+      - path-filter
+    if: ${{ needs.path-filter.outputs.changes == 'true' }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, macos-13, macos-14, windows-latest ]
+    steps:
+      # Setup and install
+      - uses: actions/checkout@v4
+      - uses: volta-cli/action@v4
+      - run: npm ci
+      # Test
 
   # !!! This check should be required by GitHub !!!
   test-status-check:
