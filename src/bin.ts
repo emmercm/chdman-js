@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import ChdmanBin from './chdman/chdmanBin.js';
 
 // eslint-disable-next-line unicorn/prefer-top-level-await
