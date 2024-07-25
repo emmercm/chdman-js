@@ -13,10 +13,10 @@ export enum CHDCompressionAlgorithm {
 }
 
 export enum CHDType {
-  RAW = 1,
-  HARD_DISK,
-  CD_ROM,
-  GD_ROM,
-  DVD_ROM,
+  RAW = 'RAW',
+  HARD_DISK = 'HARD_DISK',
+  CD_ROM = 'CD_ROM',
+  GD_ROM = 'GD_ROM',
+  DVD_ROM = 'DVD_ROM',
   // LASER_DISC,
 }
