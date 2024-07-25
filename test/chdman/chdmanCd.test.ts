@@ -31,7 +31,7 @@ it('should fail on nonexistent file', async () => {
 });
 
 test.each([
-  [path.join('test', 'fixtures', 'cue', 'single.cue'), 19_584, 2352],
+  [path.join('test', 'fixtures', 'cue', 'single.cue'), undefined, 2352],
   [path.join('test', 'fixtures', 'cue', 'multiple.cue'), 14_688, Math.floor((4704 + 7056 + 3000) / 2352) * 2352],
 ])('should create, info, and extract: %s', async (cue, hunkSize, expectedBinSize) => {
   const temporaryChd = `${await TestUtil.mktemp(path.join(os.tmpdir(), path.basename(cue)))}.chd`;
