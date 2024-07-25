@@ -38,15 +38,6 @@ test.each([
   const temporaryCue = `${temporaryChd}.cue`;
   const temporaryBin = `${temporaryChd}.bin`;
 
-  await ChdmanCd.createCd({
-    inputFilename: cue,
-    outputFilename: temporaryChd,
-  });
-  const info = await ChdmanInfo.info({
-    inputFilename: temporaryChd,
-  });
-  console.log(info);
-
   try {
     await ChdmanCd.createCd({
       inputFilename: cue,
