@@ -11,13 +11,29 @@
 
 ## Supported platforms
 
-| OS                     | Architectures                                        | Additional Instructions                                                                                 |
-|------------------------|------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
-| [Windows](./bin/win32) | • x64<br>• x86                                       |                                                                                                         |
-| [macOS](./bin/darwin)  | • arm64 (Apple Silicon)<br>• x64 (Intel)             | [SDL2](https://www.libsdl.org/) is required to be installed separately:<br><pre>brew install sdl2</pre> |
-| [Linux](./bin/linux)   | • x64<br>• x86<br>• arm (armhf)<br>• arm64 (aarch64) |                                                                                                         |
+| OS                     | Architectures                                        | Additional Instructions                                                                                                                                                                               |
+|------------------------|------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [Windows](./bin/win32) | • x64<br>• x86                                       |                                                                                                                                                                                                       |
+| [macOS](./bin/darwin)  | • arm64 (Apple Silicon)<br>• x64 (Intel)             | [SDL2](https://www.libsdl.org/) is required to be installed separately:<br><pre>brew install sdl2</pre>                                                                                               |
+| [Linux](./bin/linux)   | • x64<br>• x86<br>• arm (armhf)<br>• arm64 (aarch64) | [SDL2](https://www.libsdl.org/) is required to be installed separately:<ul><li>Debian: `apt-get install libsdl2-2.0-0`</li><li>Gentoo: `emerge libsdl2`</li><li>Red Hat: `dnf install SDL2`</li></ul> |
 
 Any `chdman` that exists on your `$PATH` will be preferred over the bundled binaries. This lets you control the build that is right for your machine.
+
+## Running
+
+You can easily run the `chdman` binary for your OS from the command line like this:
+
+```shell
+npx chdman [command] [options..]
+```
+
+Examples:
+
+```shell
+npx chdman help
+npx chdman info --input Image.chd
+npx chdman createcd --input Disc.cue --output Disc.chd
+```
 
 ## Installation
 
