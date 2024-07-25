@@ -38,6 +38,8 @@ export default {
    * Return info about a CHD file.
    */
   async info(options: InfoOptions, attempt = 1): Promise<CHDInfo> {
+    const MAX_ATTEMPTS = 3;
+
     if (!await util.promisify(fs.exists)(options.inputFilename)) {
       throw new Error(`input file doesn't exist: ${options.inputFilename}`);
     }
@@ -47,6 +49,14 @@ export default {
       '--input', options.inputFilename,
       '--verbose',
     ]);
+
+    // Try to detect failures, and then retry them automatically
+    if (!output.trim() && attempt < MAX_ATTEMPTS) {
+      await new Promise((resolve) => {
+        setTimeout(resolve, Math.random() * (2 ** (attempt - 1) * 20));
+      });
+      return this.info(options, attempt + 1);
+    }
 
     const parsedKeys = new Map<string, string>();
     for (const line of output.split(/\r?\n/)) {
@@ -113,7 +123,7 @@ export default {
     } satisfies CHDInfo;
 
     // Try to detect failures, and then retry them automatically
-    if (chdInfo.fileVersion === 0 && attempt < 3) {
+    if (chdInfo.fileVersion === 0 && attempt < MAX_ATTEMPTS) {
       await new Promise((resolve) => {
         setTimeout(resolve, Math.random() * (2 ** (attempt - 1) * 20));
       });
