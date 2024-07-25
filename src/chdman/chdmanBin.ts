@@ -59,6 +59,8 @@ export default class ChdmanBin {
       throw new Error('chdman not found');
     }
 
+    console.log(arguments_);
+
     // if (process.platform === 'darwin'
     // && !fs.existsSync(path.join('Library', 'Frameworks', 'SDL2.framework'))) {
     //   throw new Error('chdman requires the SDL2 framework to be installed on macOS');
