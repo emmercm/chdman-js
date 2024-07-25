@@ -1,8 +1,8 @@
-import ChdmanBin from '../../src/chdman/chdmanBin.js';
+import ChdmanHelp from '../../src/chdman/chdmanHelp.js';
 
 it('should print the help message', async () => {
   try {
-    await ChdmanBin.run(['help']);
+    await ChdmanHelp.help();
   } catch (error) {
     // eslint-disable-next-line jest/no-conditional-expect
     expect(error).toBeTruthy();
