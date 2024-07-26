@@ -11,13 +11,11 @@
 
 ## Supported platforms
 
-| OS                     | Architectures                                        | Additional Instructions                                                                                                                                                                               |
-|------------------------|------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [Windows](./bin/win32) | • x64<br>• x86                                       |                                                                                                                                                                                                       |
-| [macOS](./bin/darwin)  | • arm64 (Apple Silicon)<br>• x64 (Intel)             | [SDL2](https://www.libsdl.org/) is required to be installed separately:<br><pre>brew install sdl2</pre>                                                                                               |
-| [Linux](./bin/linux)   | • x64<br>• x86<br>• arm (armhf)<br>• arm64 (aarch64) | [SDL2](https://www.libsdl.org/) is required to be installed separately:<ul><li>Debian: `apt-get install libsdl2-2.0-0`</li><li>Gentoo: `emerge libsdl2`</li><li>Red Hat: `dnf install SDL2`</li></ul> |
-
-Any `chdman` that exists on your `$PATH` will be preferred over the bundled binaries. This lets you control the build that is right for your machine.
+| OS                     | Architectures                                                                 | Additional Instructions                                                                                                                                                                               |
+|------------------------|-------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [Windows](./bin/win32) | <ul><li>x64</li><li>x86</li></ul>                                             |                                                                                                                                                                                                       |
+| [macOS](./bin/darwin)  | <ul><li>arm64 (Apple Silicon)</li><li>x64 (Intel)</li></ul>                   | [SDL2](https://www.libsdl.org/) is required to be installed separately:</li><pre>brew install sdl2</pre>                                                                                              |
+| [Linux](./bin/linux)   | <ul><li>x64</li><li>x86</li><li>arm (armhf)</li><li>arm64 (aarch64)</li></ul> | [SDL2](https://www.libsdl.org/) is required to be installed separately:<ul><li>Debian: `apt-get install libsdl2-2.0-0`</li><li>Gentoo: `emerge libsdl2`</li><li>Red Hat: `dnf install SDL2`</li></ul> |
 
 ## Running
 
@@ -91,3 +89,7 @@ await chdman.extractDvd({
   outputFilename: 'Extracted.iso',
 });
 ```
+
+## License
+
+MAME and its tools are licensed under the GPLv2 license.

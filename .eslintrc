@@ -95,6 +95,9 @@
     "no-restricted-syntax": ["error", {
       "selector": "CallExpression[callee.property.name='push'] > SpreadElement",
       "message": "Array#push(...Array) can cause 'call stack size exceeded' runtime errors when pushing many values, prefer 'Array = [...Array, ...Array]'"
-    }]
+    }],
+
+    // ***** Strings *****
+    "unicorn/prefer-string-replace-all": ["off"]
   }
 }

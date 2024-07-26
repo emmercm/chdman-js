@@ -18,14 +18,14 @@ it('should fail on nonexistent file', async () => {
     await expect(ChdmanDvd.createDvd({
       inputFilename: os.devNull,
       outputFilename: temporaryChd,
-    })).rejects.toBeDefined();
+    })).rejects.toBeTruthy();
     await expect(ChdmanInfo.info({
       inputFilename: temporaryIso,
-    })).rejects.toBeDefined();
+    })).rejects.toBeTruthy();
     await expect(ChdmanDvd.createDvd({
       inputFilename: temporaryChd,
       outputFilename: temporaryIso,
-    })).rejects.toBeDefined();
+    })).rejects.toBeTruthy();
   } finally {
     await util.promisify(fs.rm)(temporaryChd, { force: true });
   }

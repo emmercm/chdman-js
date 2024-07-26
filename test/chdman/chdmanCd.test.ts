@@ -16,15 +16,15 @@ it('should fail on nonexistent file', async () => {
     await expect(ChdmanCd.createCd({
       inputFilename: os.devNull,
       outputFilename: temporaryChd,
-    })).rejects.toBeDefined();
+    })).rejects.toBeTruthy();
     await expect(ChdmanInfo.info({
       inputFilename: temporaryChd,
-    })).rejects.toBeDefined();
+    })).rejects.toBeTruthy();
     await expect(ChdmanCd.extractCd({
       inputFilename: temporaryChd,
       outputFilename: temporaryCue,
       outputBinFilename: temporaryBin,
-    })).rejects.toBeDefined();
+    })).rejects.toBeTruthy();
   } finally {
     await util.promisify(fs.rm)(temporaryChd, { force: true });
   }

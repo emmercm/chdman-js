@@ -17,14 +17,14 @@ it('should fail on nonexistent file', async () => {
       outputFilename: temporaryChd,
       hunkSize: 64,
       unitSize: 64,
-    })).rejects.toBeDefined();
+    })).rejects.toBeTruthy();
     await expect(ChdmanInfo.info({
       inputFilename: temporaryRaw,
-    })).rejects.toBeDefined();
+    })).rejects.toBeTruthy();
     await expect(ChdmanRaw.extractRaw({
       inputFilename: temporaryChd,
       outputFilename: temporaryRaw,
-    })).rejects.toBeDefined();
+    })).rejects.toBeTruthy();
   } finally {
     await util.promisify(fs.rm)(temporaryChd, { force: true });
   }
