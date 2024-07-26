@@ -89,3 +89,7 @@ await chdman.extractDvd({
   outputFilename: 'Extracted.iso',
 });
 ```
+
+## License
+
+MAME and its tools are licensed under the GPLv2 license.
