@@ -98,7 +98,10 @@ export default class ChdmanBin {
         }
         return resolve(output);
       });
-      proc.on('error', reject);
+      proc.on('error', () => {
+        const output = Buffer.concat(chunks).toString();
+        reject(output);
+      });
     });
   }
 }

@@ -17,14 +17,14 @@ it('should fail on nonexistent file', async () => {
     await expect(ChdmanHd.createHd({
       inputFilename: os.devNull,
       outputFilename: temporaryChd,
-    })).rejects.toBeDefined();
+    })).rejects.toBeTruthy();
     await expect(ChdmanInfo.info({
       inputFilename: temporaryHd,
-    })).rejects.toBeDefined();
+    })).rejects.toBeTruthy();
     await expect(ChdmanHd.extractHd({
       inputFilename: temporaryChd,
       outputFilename: temporaryHd,
-    })).rejects.toBeDefined();
+    })).rejects.toBeTruthy();
   } finally {
     await util.promisify(fs.rm)(temporaryChd, { force: true });
   }
