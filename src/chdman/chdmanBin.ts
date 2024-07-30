@@ -92,14 +92,14 @@ export default class ChdmanBin {
       });
 
       proc.on('exit', (code) => {
-        const output = Buffer.concat(chunks).toString();
+        const output = Buffer.concat(chunks).toString().trim();
         if ((code !== null && code !== 0) || killed) {
           return reject(output);
         }
         return resolve(output);
       });
       proc.on('error', () => {
-        const output = Buffer.concat(chunks).toString();
+        const output = Buffer.concat(chunks).toString().trim();
         reject(output);
       });
     });
