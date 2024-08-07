@@ -91,7 +91,7 @@ export default class ChdmanBin {
         }
       });
 
-      proc.on('exit', (code) => {
+      proc.on('close', (code) => {
         const output = Buffer.concat(chunks).toString().trim();
         if ((code !== null && code !== 0) || killed) {
           return reject(output);
