@@ -80,21 +80,6 @@ jobs:
           npm start -- createcd --input test/fixtures/cue/multiple.cue --output multiple.chd --hunksize 14688
           npm start -- info --input multiple.chd
 
-  node-e2e:
-    needs:
-      - path-filter
-    if: ${{ needs.path-filter.outputs.changes == 'true' }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ ubuntu-latest, macos-13, macos-14, windows-latest ]
-    steps:
-      # Setup and install
-      - uses: actions/checkout@v4
-      - uses: volta-cli/action@v4
-      - run: npm ci
-      # Test
-
   # !!! This check should be required by GitHub !!!
   test-status-check:
     if: always()

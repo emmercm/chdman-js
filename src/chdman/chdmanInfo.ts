@@ -49,9 +49,9 @@ export default {
     ]);
 
     // Try to detect failures, and then retry them automatically
-    if (!output.trim() && attempt <= 5) {
+    if (!output.trim() && attempt <= 3) {
       await new Promise((resolve) => {
-        setTimeout(resolve, Math.random() * (2 ** (attempt - 1) * 10));
+        setTimeout(resolve, Math.random() * (2 ** (attempt - 1) * 20));
       });
       return this.info(options, attempt + 1);
     }
@@ -121,7 +121,7 @@ export default {
     } satisfies CHDInfo;
 
     // Try to detect failures, and then retry them automatically
-    if (chdInfo.fileVersion === 0 && attempt <= 5) {
+    if (chdInfo.fileVersion === 0 && attempt <= 3) {
       await new Promise((resolve) => {
         setTimeout(resolve, Math.random() * (2 ** (attempt - 1) * 20));
       });
