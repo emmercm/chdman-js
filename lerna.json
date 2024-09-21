@@ -13,6 +13,9 @@
       "npmClientArgs": [
         "--force"
       ]
+    },
+    "publish": {
+      "throttle": true
     }
   }
 }
