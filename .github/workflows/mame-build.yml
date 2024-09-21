@@ -232,7 +232,7 @@ jobs:
           else
             new_version="${major_version}.${minor_version}.0"
           fi
-          lerna version "${new_version} --yes || true
+          lerna version "${new_version}" --yes || true
 
           chmod +x packages/chdman-*-*/chdman*
           ls -alR
