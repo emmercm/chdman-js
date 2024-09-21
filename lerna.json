@@ -6,7 +6,6 @@
   ],
   "command": {
     "version": {
-      "forcePublish": true,
       "changelog": false,
       "gitTagVersion": false,
       "push": false,
