@@ -60,11 +60,7 @@ jobs:
       - uses: volta-cli/action@v4
         with:
           node-version: ${{ matrix.node-version }}
-      # Fix workspaces with npm v7.19.1 from Node.js v16.6.0
-      - run: |
-          sudo npm install -g npm@latest
-          npm --version
-      - run: npm ci --workspaces --force
+      - run: npm ci --force
       - if: ${{ startsWith(matrix.os, 'ubuntu') }}
         run: |
           sudo apt-get update
