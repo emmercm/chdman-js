@@ -35,7 +35,7 @@ export default class ChdmanBin {
     }
 
     try {
-      const chdman = await import(`chdman-${process.platform}-${process.arch}`);
+      const chdman = await import(`@emmercm/chdman-${process.platform}-${process.arch}`);
       const prebuilt = chdman.default;
       if (await util.promisify(fs.exists)(prebuilt)) {
         ChdmanBin.CHDMAN_BIN = prebuilt;
