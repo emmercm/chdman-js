@@ -75,14 +75,14 @@ jobs:
       # Test the source files
       - run: npm run test:unit
 
-      # Test building
-      - run: npm run build
-
       # Test running
       - run: |
           npm start --workspace=packages/chdman -- help
           npm start --workspace=packages/chdman -- createcd --input test/fixtures/cue/multiple.cue --output multiple.chd --hunksize 14688
           npm start --workspace=packages/chdman -- info --input multiple.chd
+
+      # Test building
+      - run: npm run build
 
   # !!! This check should be required by GitHub !!!
   test-status-check:
