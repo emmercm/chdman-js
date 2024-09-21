@@ -1,6 +1,6 @@
 {
   "name": "@emmercm/chdman-darwin-arm64",
-  "version": "0.269.0",
+  "version": "0.269.1",
   "os": [
     "darwin"
   ],
@@ -22,5 +22,23 @@
     "build": "tsc --build --verbose",
     "prepack": "npm run build && cp -f ../../{LICENSE,README.md} ./",
     "postpack": "rm ./LICENSE ./README.md"
+  },
+  "description": "💿 chdman binaries and wrapper for Node.js.",
+  "keywords": [
+    "chdman",
+    "isos",
+    "mame",
+    "roms"
+  ],
+  "homepage": "https://github.com/emmercm/chdman-js",
+  "bugs": {
+    "url": "https://github.com/emmercm/chdman-js/issues"
+  },
+  "license": "GPL-3.0-or-later",
+  "author": "Christian Emmer",
+  "funding": "https://github.com/sponsors/emmercm",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/emmercm/chdman-js.git"
   }
 }
