@@ -10,8 +10,7 @@
   "type": "module",
   "files": [
     "dist",
-    "!**/*.tsbuildinfo",
-    "chdman"
+    "!**/*.tsbuildinfo"
   ],
   "main": "dist/index.js",
   "publishConfig": {
@@ -19,7 +18,7 @@
     "provenance": true
   },
   "scripts": {
-    "build": "tsc --build --verbose",
+    "build": "tsc --build --verbose && cp chdman* dist/",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "prepack": "npm run build && cp -f ../../LICENSE ../../README.md ./",
