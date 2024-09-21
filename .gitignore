@@ -111,3 +111,4 @@ packages/*/dist/
 packages/*/test/fixtures/*/build/
 packages/*/junit.xml
 packages/*/LICENSE
+packages/*/README.md
