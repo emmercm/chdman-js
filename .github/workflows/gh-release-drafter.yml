@@ -41,6 +41,7 @@ jobs:
       - id: check
         uses: EndBug/version-check@v2
         with:
+          file-name: packages/chdman/package.json
           # NOTE: `diff-search:true` is preferred so that only the exact commit that bumps the
           #   version triggers this workflow, but `workflow_dispatch` doesn't carry commit or
           #   commit ref info that's needed for it.
