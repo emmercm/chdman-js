@@ -41,9 +41,7 @@ export default class ChdmanBin {
         ChdmanBin.CHDMAN_BIN = prebuilt;
         return prebuilt;
       }
-    } catch (error) {
-      console.log(error);
-    }
+    } catch { /* ignored */ }
 
     const resolved = await which('chdman', { nothrow: true });
     if (resolved) {
