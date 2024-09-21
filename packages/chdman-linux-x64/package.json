@@ -20,7 +20,7 @@
   },
   "scripts": {
     "build": "tsc --build --verbose",
-    "prepack": "npm run build && cp -f ../../{LICENSE,README.md} ./",
+    "prepack": "npm run build && cp -f ../../LICENSE ../../README.md ./",
     "postpack": "rm ./LICENSE ./README.md"
   },
   "description": "💿 chdman binaries and wrapper for Node.js.",
