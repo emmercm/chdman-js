@@ -20,7 +20,9 @@
     "project": "./tsconfig.json",
     "sourceType": "module"
   },
-  "ignorePatterns": ["dist/**"],
+  "ignorePatterns": [
+    "packages/*/dist/**"
+  ],
 
   "env": {
     "jest/globals": true
