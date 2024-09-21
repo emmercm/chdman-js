@@ -1,5 +1,5 @@
 {
-  "name": "chdman-linux-ia32",
+  "name": "@emmercm/chdman-linux-ia32",
   "version": "0.269.0",
   "os": [
     "linux"

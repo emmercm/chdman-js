@@ -1,5 +1,5 @@
 {
-  "name": "chdman-win32-x64",
+  "name": "@emmercm/chdman-win32-x64",
   "version": "0.269.0",
   "os": [
     "win32"

@@ -55,14 +55,14 @@
     "which": "^4.0.0"
   },
   "optionalDependencies": {
-    "chdman-darwin-arm64": "^0.269.0",
-    "chdman-darwin-x64": "^0.269.0",
-    "chdman-linux-arm": "^0.269.0",
-    "chdman-linux-arm64": "^0.269.0",
-    "chdman-linux-ia32": "^0.269.0",
-    "chdman-linux-x64": "^0.269.0",
-    "chdman-win32-ia32": "^0.269.0",
-    "chdman-win32-x64": "^0.269.0"
+    "@emmercm/chdman-darwin-arm64": "^0.269.0",
+    "@emmercm/chdman-darwin-x64": "^0.269.0",
+    "@emmercm/chdman-linux-arm": "^0.269.0",
+    "@emmercm/chdman-linux-arm64": "^0.269.0",
+    "@emmercm/chdman-linux-ia32": "^0.269.0",
+    "@emmercm/chdman-linux-x64": "^0.269.0",
+    "@emmercm/chdman-win32-ia32": "^0.269.0",
+    "@emmercm/chdman-win32-x64": "^0.269.0"
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",

@@ -1,5 +1,5 @@
 {
-  "name": "chdman-linux-arm64",
+  "name": "@emmercm/chdman-linux-arm64",
   "version": "0.269.0",
   "os": [
     "linux"

@@ -1,5 +1,5 @@
 {
-  "name": "chdman-darwin-arm64",
+  "name": "@emmercm/chdman-darwin-arm64",
   "version": "0.269.0",
   "os": [
     "darwin"

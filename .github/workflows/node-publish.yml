@@ -30,7 +30,7 @@ jobs:
         run: |
           set -x
           npm whoami
-          lerna publish from-package --throttle --yes
+          lerna publish from-package --yes
           {
             echo "PACKAGE_NAME=$(jq --raw-output '.name' package.json)"
             echo "PACKAGE_VERSION=$(jq --raw-output '.version' package.json)"
