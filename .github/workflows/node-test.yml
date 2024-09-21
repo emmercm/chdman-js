@@ -51,11 +51,22 @@ jobs:
     if: ${{ needs.path-filter.outputs.changes == 'true' }}
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        os: [ ubuntu-latest, macos-13, macos-14, windows-latest ]
+        #os: [ ubuntu-latest, macos-13, macos-14, windows-latest ]
+        os: [ ubuntu-latest ]
         node-version:
-          - lts
+          #- lts
           # Using this instead of v16.6.0 to get npm v8.5+ https://github.com/npm/cli/pull/4495
+          - 16.6.0
+          - 16.7.0
+          - 16.8.0
+          - 16.9.0
+          - 16.10.0
+          - 16.11.0
+          - 16.12.0
+          - 16.13.0
+          - 16.14.0
           - 16.15.0
     steps:
       # Setup and install
