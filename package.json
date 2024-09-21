@@ -7,7 +7,6 @@
   "scripts": {
     "lock:regen": "rm -rf package-lock.json packages/*/package-lock.json node_modules/ packages/*/node_modules/ && npm install --force",
     "clean": "lerna clean --yes && rm -rf packages/*/dist packages/*/*.tgz",
-    "start": "lerna run start --scope=chdman --",
     "build": "lerna run build",
     "lint": "lerna run lint",
     "lint:fix": "lerna run lint:fix",
