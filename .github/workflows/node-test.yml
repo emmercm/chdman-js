@@ -80,7 +80,7 @@ jobs:
       # Test running
       - run: |
           npm start -- help
-          npm start -- createcd --input test/fixtures/cue/multiple.cue --output multiple.chd --hunksize 14688
+          npm start -- createcd --input packages/chdman/test/fixtures/cue/multiple.cue --output multiple.chd --hunksize 14688
           npm start -- info --input multiple.chd
 
   # !!! This check should be required by GitHub !!!
