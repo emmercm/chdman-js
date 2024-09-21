@@ -12,6 +12,7 @@
     "lint:fix": "lerna run lint:fix",
     "test": "lerna run test",
     "test:force": "lerna run test --skip-nx-cache",
+    "test:unit": "lerna run test:unit",
     "test:coverage": "lerna run test:coverage",
     "bump:major": "lerna version major --yes",
     "bump:minor": "lerna version minor --yes",
