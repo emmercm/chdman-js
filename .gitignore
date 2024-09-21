@@ -106,3 +106,8 @@ dist
 
 # Custom
 *.chd
+.nx/
+packages/*/dist/
+packages/*/test/fixtures/*/build/
+packages/*/junit.xml
+packages/*/LICENSE

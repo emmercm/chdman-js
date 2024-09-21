@@ -99,7 +99,7 @@ jobs:
           ls -al chdman
       - name: Rename binary
         run: |
-          dir="artifacts/bin/linux/${{ matrix.nodejs_arch }}"
+          dir="artifacts/packages/chdman-linux-${{ matrix.nodejs_arch }}"
           mkdir -p "${dir}"
           mv chdman "${dir}/"
       - uses: actions/upload-artifact@v4
@@ -136,7 +136,7 @@ jobs:
       - name: Rename binary
         run: |
           # shellcheck disable=SC2016
-          dir="artifacts/bin/$(node --eval 'console.log(`${process.platform}/${process.arch}`)')"
+          dir="artifacts/packages/chdman-$(node --eval 'console.log(`${process.platform}-${process.arch}`)')"
           mkdir -p "${dir}"
           mv chdman "${dir}/"
       - uses: actions/upload-artifact@v4
@@ -197,7 +197,7 @@ jobs:
           ls -al chdman.exe
       - name: Rename binary
         run: |
-          dir="artifacts/bin/win32/${{ matrix.nodejs_arch }}"
+          dir="artifacts/packages/chdman-win32-${{ matrix.nodejs_arch }}"
           mkdir -p "${dir}"
           mv chdman.exe "${dir}/"
       - uses: actions/upload-artifact@v4
@@ -232,11 +232,11 @@ jobs:
           else
             new_version="${major_version}.${minor_version}.0"
           fi
-          npm version "${new_version}" --no-git-tag-version || true
+          lerna version "${new_version} --yes || true
 
-          chmod +x bin/**/*
+          chmod +x packages/chdman-*-*/chdman*
           ls -alR
-          git add package*.json bin
+          git add package*.json lerna.json packages
 
           USER_EMAIL="${GITHUB_ACTOR_ID}+${GITHUB_ACTOR}@users.noreply.github.com"
           echo "USER_EMAIL=${USER_EMAIL}" >> "${GITHUB_OUTPUT}"

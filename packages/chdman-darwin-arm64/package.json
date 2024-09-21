@@ -1,0 +1,22 @@
+{
+  "name": "chdman-darwin-arm64",
+  "version": "0.269.0",
+  "os": [
+    "darwin"
+  ],
+  "cpu": [
+    "arm64"
+  ],
+  "type": "module",
+  "files": [
+    "dist",
+    "!**/*.tsbuildinfo",
+    "chdman"
+  ],
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc --build --verbose",
+    "prepack": "npm run build && cp -f ../../{LICENSE,README.md} ./",
+    "postpack": "rm ./LICENSE ./README.md"
+  }
+}

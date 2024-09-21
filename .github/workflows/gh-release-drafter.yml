@@ -51,7 +51,7 @@ jobs:
       - if: steps.check.outputs.changed == 'true'
         uses: volta-cli/action@v4
       - if: steps.check.outputs.changed == 'true'
-        run: npm ci
+        run: npm ci --force
 
       # Generate the release's markdown template
       - if: steps.check.outputs.changed == 'true'

@@ -41,7 +41,7 @@ jobs:
       # Setup and install
       - uses: actions/checkout@v4
       - uses: volta-cli/action@v4
-      - run: npm ci
+      - run: npm ci --force
       # Lint the source files
       - run: npm run lint
 
@@ -60,7 +60,7 @@ jobs:
       - uses: volta-cli/action@v4
         with:
           node-version: ${{ matrix.node-version }}
-      - run: npm ci
+      - run: npm ci --force
       - if: ${{ startsWith(matrix.os, 'ubuntu') }}
         run: |
           sudo apt-get update

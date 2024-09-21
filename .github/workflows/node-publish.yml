@@ -24,13 +24,13 @@ jobs:
       - uses: volta-cli/action@v4
         with:
           registry-url: 'https://registry.npmjs.org'
-      - run: npm ci
+      - run: npm ci --force
       - id: publish
         name: npm publish
         run: |
           set -x
           npm whoami
-          npm publish
+          lerna publish from-package --yes
           {
             echo "PACKAGE_NAME=$(jq --raw-output '.name' package.json)"
             echo "PACKAGE_VERSION=$(jq --raw-output '.version' package.json)"
