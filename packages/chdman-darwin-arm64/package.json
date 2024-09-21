@@ -20,6 +20,8 @@
   },
   "scripts": {
     "build": "tsc --build --verbose",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "prepack": "npm run build && cp -f ../../LICENSE ../../README.md ./",
     "postpack": "rm ./LICENSE ./README.md"
   },
