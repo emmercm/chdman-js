@@ -87,9 +87,10 @@ jobs:
 
       # Test running
       - run: |
-          ./node_modules/.bin/lerna run start --scope=chdman -- help
-          ./node_modules/.bin/lerna run start --scope=chdman -- createcd --input test/fixtures/cue/multiple.cue --output multiple.chd --hunksize 14688
-          ./node_modules/.bin/lerna run start --scope=chdman -- info --input multiple.chd
+          cd packages/chdman
+          npm start -- help
+          npm start -- createcd --input test/fixtures/cue/multiple.cue --output multiple.chd --hunksize 14688
+          npm start -- info --input multiple.chd
 
   # !!! This check should be required by GitHub !!!
   test-status-check:
