@@ -5,7 +5,6 @@
     "packages/*"
   ],
   "scripts": {
-    "postinstall": "lerna run postinstall",
     "lock:regen": "rm -rf package-lock.json packages/*/package-lock.json node_modules/ packages/*/node_modules/ && npm install --force",
     "clean": "lerna clean --yes && rm -rf packages/*/dist packages/*/*.tgz",
     "build": "lerna run build",
