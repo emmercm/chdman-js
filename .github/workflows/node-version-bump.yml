@@ -36,6 +36,7 @@ jobs:
         run: |
           npm run "bump:${{ inputs.increment }}"
           for PACKAGE in packages/chdman-*; do
+            # shellcheck disable=SC2005
             echo "$(jq '. + (input|{description,keywords,homepage,bugs,license,author,funding,repository,publishConfig})' "${PACKAGE}/package.json" packages/chdman/package.json)" > "${PACKAGE}/package.json"
           done
           git add --all
