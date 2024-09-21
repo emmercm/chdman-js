@@ -27,9 +27,9 @@ jobs:
           filters: |
             changes:
               - '.github/workflows/node-test.yml'
-              - 'bin/**'
-              - 'src/**'
-              - 'test/**'
+              - 'packages/*/src/**'
+              - 'packages/*/test/**'
+              - 'packages/chdman-*-*/**'
               - '*'
 
   node-lint:
@@ -41,7 +41,7 @@ jobs:
       # Setup and install
       - uses: actions/checkout@v4
       - uses: volta-cli/action@v4
-      - run: npm ci
+      - run: npm ci --force
       # Lint the source files
       - run: npm run lint
 
@@ -51,16 +51,20 @@ jobs:
     if: ${{ needs.path-filter.outputs.changes == 'true' }}
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ ubuntu-latest, macos-13, macos-14, windows-latest ]
-        node-version: [ lts, 16.6.0 ]
+        node-version:
+          - lts
+          # Using this instead of v16.6.0 to get npm v8.1+ to fix workspace issues
+          - 16.12.0
     steps:
       # Setup and install
       - uses: actions/checkout@v4
       - uses: volta-cli/action@v4
         with:
           node-version: ${{ matrix.node-version }}
-      - run: npm ci
+      - run: npm ci --force
       - if: ${{ startsWith(matrix.os, 'ubuntu') }}
         run: |
           sudo apt-get update
@@ -71,14 +75,14 @@ jobs:
       # Test the source files
       - run: npm run test:unit
 
-      # Test building
-      - run: npm run build
-
       # Test running
       - run: |
-          npm start -- help
-          npm start -- createcd --input test/fixtures/cue/multiple.cue --output multiple.chd --hunksize 14688
-          npm start -- info --input multiple.chd
+          npm start --workspace=packages/chdman -- help
+          npm start --workspace=packages/chdman -- createcd --input test/fixtures/cue/multiple.cue --output multiple.chd --hunksize 14688
+          npm start --workspace=packages/chdman -- info --input multiple.chd
+
+      # Test building
+      - run: npm run build
 
   # !!! This check should be required by GitHub !!!
   test-status-check:

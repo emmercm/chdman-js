@@ -7,6 +7,11 @@ import ChdmanInfo from '../../src/chdman/chdmanInfo.js';
 import TestUtil from '../testUtil.js';
 import { CHDType } from '../../src/chdman/common.js';
 
+// import {jest} from '@jest/globals';
+// jest.unstable_mockModule(`chdman-${process.platform}-${process.arch}`, () => {
+//   const i = 0;
+// });
+
 it('should fail on nonexistent file', async () => {
   const temporaryChd = `${await TestUtil.mktemp(path.join(os.tmpdir(), 'dummy'))}.chd`;
   const temporaryCue = `${temporaryChd}.cue`;

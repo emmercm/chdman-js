@@ -1,0 +1,98 @@
+{
+  "name": "chdman",
+  "version": "0.269.0",
+  "description": "💿 chdman binaries and wrapper for Node.js.",
+  "keywords": [
+    "chdman",
+    "isos",
+    "mame",
+    "roms"
+  ],
+  "homepage": "https://github.com/emmercm/chdman-js",
+  "bugs": {
+    "url": "https://github.com/emmercm/chdman-js/issues"
+  },
+  "license": "GPL-3.0-or-later",
+  "author": "Christian Emmer",
+  "funding": "https://github.com/sponsors/emmercm",
+  "type": "module",
+  "files": [
+    "dist",
+    "!**/test/**",
+    "!**/*.test.*",
+    "!**/jest.*",
+    "!**/*.tsbuildinfo",
+    "bin"
+  ],
+  "main": "dist/index.js",
+  "bin": {
+    "chdman": "dist/src/bin.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/emmercm/chdman-js.git"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "start": "node --loader ts-node/esm src/bin.ts",
+    "build": "tsc --build --verbose && node --eval \"if(process.platform!=='win32'){process.exit(1);}\" || chmod +x dist/index.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test": "npm run test:unit && npm run lint",
+    "test:unit": "node --experimental-vm-modules ../../node_modules/jest/bin/jest.js --verbose",
+    "test:coverage": "node --experimental-vm-modules ../../node_modules/jest/bin/jest.js --verbose --coverage",
+    "test:handles": "node --experimental-vm-modules ../../node_modules/jest/bin/jest.js --verbose --detectOpenHandles",
+    "bump:major": "npm version major --no-git-tag-version",
+    "bump:minor": "npm version minor --no-git-tag-version",
+    "bump:patch": "npm version patch --no-git-tag-version",
+    "prepack": "npm run build && cp -f ../../LICENSE ./",
+    "postpack": "rm ./LICENSE"
+  },
+  "dependencies": {
+    "which": "^4.0.0"
+  },
+  "optionalDependencies": {
+    "@emmercm/chdman-darwin-arm64": "^0.269.0",
+    "@emmercm/chdman-darwin-x64": "^0.269.0",
+    "@emmercm/chdman-linux-arm": "^0.269.0",
+    "@emmercm/chdman-linux-arm64": "^0.269.0",
+    "@emmercm/chdman-linux-ia32": "^0.269.0",
+    "@emmercm/chdman-linux-x64": "^0.269.0",
+    "@emmercm/chdman-win32-ia32": "^0.269.0",
+    "@emmercm/chdman-win32-x64": "^0.269.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.11.24",
+    "@types/which": "^3.0.3",
+    "@typescript-eslint/eslint-plugin": "^7.1.0",
+    "auto-changelog": "^2.4.0",
+    "eslint": "^8.57.0",
+    "eslint-config-airbnb-typescript": "^18.0.0",
+    "eslint-plugin-jest": "^27.9.0",
+    "eslint-plugin-jsdoc": "^48.2.0",
+    "eslint-plugin-simple-import-sort": "^12.0.0",
+    "eslint-plugin-unicorn": "^51.0.1",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  },
+  "//engines": [
+    "Requires >=14.17.0 for TypeScript v5.1.",
+    "Requires ^12.20.0 || ^14.13.1 || >=16.0.0 for ES6 modules, even though `tsc` can target ES5 or lower.",
+    "Requires ^14.18.0 || >=16.0.0 for `node:` prefixed built-in modules that many dependencies use.",
+    "Requires >=15.0.0 for npm v7 for package-lock.json v3 because Renovate stopped respecting the existing version in August 2023.",
+    "Requires ^14.18.0 || >=16.3.0 for `os.devNull`.",
+    "Requires >=16.6.0 for `Array.prototype.at()`."
+  ],
+  "engines": {
+    "node": ">=16.6.0"
+  },
+  "volta": {
+    "node": "20.11.1"
+  }
+}

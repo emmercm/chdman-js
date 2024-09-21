@@ -34,11 +34,15 @@ export default class ChdmanBin {
       return ChdmanBin.CHDMAN_BIN;
     }
 
-    const rootDirectory = await this.findRoot() ?? process.cwd();
-    const prebuilt = path.join(rootDirectory, 'bin', process.platform, process.arch, `chdman${process.platform === 'win32' ? '.exe' : ''}`);
-    if (await util.promisify(fs.exists)(prebuilt)) {
-      ChdmanBin.CHDMAN_BIN = prebuilt;
-      return prebuilt;
+    try {
+      const chdman = await import(`@emmercm/chdman-${process.platform}-${process.arch}`);
+      const prebuilt = chdman.default;
+      if (await util.promisify(fs.exists)(prebuilt)) {
+        ChdmanBin.CHDMAN_BIN = prebuilt;
+        return prebuilt;
+      }
+    } catch (error) {
+      console.log(error);
     }
 
     const resolved = await which('chdman', { nothrow: true });

@@ -29,12 +29,16 @@ jobs:
       # Setup and install
       - uses: actions/checkout@v4
       - uses: volta-cli/action@v4
-      - run: npm ci
+      - run: npm ci --force
 
       # Bump the version and commit to the default branch
       - id: bump-and-commit
         run: |
           npm run "bump:${{ inputs.increment }}"
+          for PACKAGE in packages/chdman-*; do
+            # shellcheck disable=SC2005
+            echo "$(jq '. + (input|{description,keywords,homepage,bugs,license,author,funding,repository})' "${PACKAGE}/package.json" packages/chdman/package.json)" > "${PACKAGE}/package.json"
+          done
           git add --all
 
           USER_EMAIL="${GITHUB_ACTOR_ID}+${GITHUB_ACTOR}@users.noreply.github.com"
@@ -45,7 +49,7 @@ jobs:
           echo "USER_NAME=${USER_NAME}" >> "${GITHUB_OUTPUT}"
           git config --global user.name "${USER_NAME}"
 
-          PACKAGE_VERSION="$(jq --raw-output '.version' package.json)"
+          PACKAGE_VERSION="$(jq --raw-output '.version' packages/chdman/package.json)"
           echo "PACKAGE_VERSION=${PACKAGE_VERSION}" >> "${GITHUB_OUTPUT}"
           git commit -m "v${PACKAGE_VERSION}"
         env:

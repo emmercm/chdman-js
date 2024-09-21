@@ -1,0 +1,26 @@
+{
+  "name": "@emmercm/chdman-win32-ia32",
+  "version": "0.269.0",
+  "os": [
+    "win32"
+  ],
+  "cpu": [
+    "ia32"
+  ],
+  "type": "module",
+  "files": [
+    "dist",
+    "!**/*.tsbuildinfo",
+    "chdman.exe"
+  ],
+  "main": "dist/index.js",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "tsc --build --verbose",
+    "prepack": "npm run build && cp -f ../../{LICENSE,README.md} ./",
+    "postpack": "rm ./LICENSE ./README.md"
+  }
+}
