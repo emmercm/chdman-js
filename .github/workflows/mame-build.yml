@@ -81,7 +81,7 @@ jobs:
             sudo add-apt-repository --yes --no-update "deb [arch=${{ matrix.apt_architecture }}] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release --codename | awk '{print $2}') main multiverse restricted universe"
             sudo add-apt-repository --yes --no-update "deb [arch=${{ matrix.apt_architecture }}] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release --codename | awk '{print $2}')-updates main multiverse restricted universe"
           fi
-          sudo apt-get update -y -o APT::Architecture="${{ matrix.apt_architecture }}" -o APT::Architectures="${{ matrix.apt_architecture }}" || true
+          sudo apt-get update || true
           sudo apt-get install -y crossbuild-essential-${{ matrix.apt_architecture }} libsdl2-dev:${{ matrix.apt_architecture }}
       - name: Build
         env:
