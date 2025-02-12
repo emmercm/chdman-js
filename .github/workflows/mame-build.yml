@@ -90,6 +90,7 @@ jobs:
 
           # TODO(cemmer): DEBUG!
           sudo cat /etc/apt/sources.list
+          sudo cat /etc/apt/sources.list.d/ubuntu.sources
           apt-cache madison libsdl2-dev
 
           sudo apt-get install --yes crossbuild-essential-${{ matrix.apt_architecture }} libsdl2-dev:${{ matrix.apt_architecture }}
