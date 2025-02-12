@@ -95,7 +95,8 @@ jobs:
           TARGETOS: linux
           USE_LIBSDL: 1
         run: |
-          export ARCHOPTS="${ARCHOPTS} -Wl,-Bstatic -lSDL2 -Wl,-Bdynamic $(sdl2-config --static-libs)"
+          ARCHOPTS="${ARCHOPTS} $(sdl2-config --static-libs)"
+          export ARCHOPTS
           make "-j$(nproc)" -r
           file chdman
           ldd chdman
@@ -134,7 +135,8 @@ jobs:
         env:
           USE_LIBSDL: 1
         run: |
-          export ARCHOPTS="${ARCHOPTS} -Wl,-Bstatic -lSDL2 -Wl,-Bdynamic $(sdl2-config --static-libs)"
+          ARCHOPTS="${ARCHOPTS} $(sdl2-config --static-libs)"
+          export ARCHOPTS
           make "-j$(sysctl -n hw.physicalcpu)" -r
           file chdman
           otool -L chdman
