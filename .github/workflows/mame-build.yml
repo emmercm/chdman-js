@@ -5,10 +5,12 @@
 name: MAME Build
 
 on:
+  # TODO(cemmer): DEBUG!
+  push:
   workflow_dispatch:
     inputs:
       mame_ref:
-        description: 'MAME GitHub branch, tag, or SHA (e.g. "mame0262")'
+        description: 'MAME GitHub branch, tag, or SHA (e.g. "mame0274")'
         required: true
         type: string
       auto-merge:
@@ -25,7 +27,7 @@ permissions:
   contents: write
 
 env:
-  MAME_REF: ${{ inputs.mame_ref || 'mame0262' }}
+  MAME_REF: ${{ inputs.mame_ref || 'mame0274' }}
   # `make` options
   EMULATOR: 0
   TOOLS: 1
