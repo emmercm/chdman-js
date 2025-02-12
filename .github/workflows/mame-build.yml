@@ -74,42 +74,19 @@ jobs:
           set -x
 
           # https://docs.mamedev.org/initialsetup/compilingmame.html#debian-and-ubuntu-including-raspberry-pi-and-odroid-devices
-          sudo apt-get update --print-uris
+          sudo apt-get update
           sudo apt-get install --yes git build-essential python3 libsdl2-dev libsdl2-ttf-dev libfontconfig-dev libpulse-dev qtbase5-dev qtbase5-dev-tools qtchooser qt5-qmake \
 
-          # TODO(cemmer): DEBUG!
-          sudo cat /etc/apt/sources.list
           sudo sed -ie "s/deb /deb [arch=$(dpkg --print-architecture)] /g" /etc/apt/sources.list
-          sudo cat /etc/apt/sources.list
-          #sudo rm /etc/apt/sources.list
-
-          #sudo apt-get install --yes software-properties-common
+          sudo dpkg --add-architecture amd64
           sudo dpkg --add-architecture i386
           echo "deb [arch=amd64,i386] http://archive.ubuntu.com/ubuntu/ $(lsb_release --codename | awk '{print $2}') main multiverse restricted universe" | sudo tee -a /etc/apt/sources.list
           echo "deb [arch=amd64,i386] http://archive.ubuntu.com/ubuntu/ $(lsb_release --codename | awk '{print $2}')-updates main multiverse restricted universe" | sudo tee -a /etc/apt/sources.list
-          #sudo add-apt-repository --yes --no-update "deb [arch=amd64,i386] http://archive.ubuntu.com/ubuntu/ $(lsb_release --codename | awk '{print $2}') main multiverse restricted universe"
-          #sudo add-apt-repository --yes --no-update "deb [arch=amd64,i386] http://archive.ubuntu.com/ubuntu/ $(lsb_release --codename | awk '{print $2}')-updates main multiverse restricted universe"
           sudo dpkg --add-architecture armhf
           sudo dpkg --add-architecture arm64
           echo "deb [arch=armhf,arm64,ppc64el,riscv64,s390x] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release --codename | awk '{print $2}') main multiverse restricted universe" | sudo tee -a /etc/apt/sources.list
           echo "deb [arch=armhf,arm64,ppc64el,riscv64,s390x] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release --codename | awk '{print $2}')-updates main multiverse restricted universe" | sudo tee -a /etc/apt/sources.list
-          #sudo add-apt-repository --yes --no-update "deb [arch=armhf,arm64,ppc64el,riscv64,s390x] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release --codename | awk '{print $2}') main multiverse restricted universe"
-          #sudo add-apt-repository --yes --no-update "deb [arch=armhf,arm64,ppc64el,riscv64,s390x] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release --codename | awk '{print $2}')-updates main multiverse restricted universe"
-
-          # TODO(cemmer): DEBUG!
-          sudo cat /etc/apt/sources.list
-
           sudo apt-get update || true
-          #sudo apt-get update --print-uris --option APT::Architecture="${{ matrix.apt_architecture }}" --option APT::Architectures="${{ matrix.apt_architecture }}" || true
-
-          # TODO(cemmer): DEBUG!
-          echo "----- 1 -----"
-          sudo cat /etc/apt/sources.list
-          echo "----- 2 -----"
-          sudo cat /etc/apt/sources.list.d/ubuntu.sources
-          echo "----- 3 -----"
-          apt-cache madison libsdl2-dev
-
           sudo apt-get install --yes crossbuild-essential-${{ matrix.apt_architecture }} libsdl2-dev:${{ matrix.apt_architecture }}
 
           # TODO(ccemmer): DEBUG!
