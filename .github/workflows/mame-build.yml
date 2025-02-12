@@ -93,9 +93,9 @@ jobs:
           OVERRIDE_CXX: ${{ matrix.cxx || 'g++' }}
           ARCHOPTS: -U_FORTIFY_SOURCE ${{ matrix.archopts }}
           TARGETOS: linux
-          USE_LIBSDL: 1
+          USE_LIBSDL: 0
         run: |
-          ARCHOPTS="${ARCHOPTS} -Wl,-Bstatic -lSDL2 -Wl,-Bdynamic $(sdl2-config --static-libs | awk '{for (i=2; i<NF; i++) printf $i " "; print $NF}')"
+          ARCHOPTS="${ARCHOPTS} -D_REENTRANT -Wl,-Bstatic -lSDL2 -Wl,-Bdynamic $(sdl2-config --static-libs | awk '{for (i=2; i<NF; i++) printf $i " "; print $NF}')"
           export ARCHOPTS
           make "-j$(nproc)" -r
           file chdman
@@ -133,10 +133,11 @@ jobs:
         run: brew install --overwrite python3 sdl2
       - name: Build
         env:
-          USE_LIBSDL: 1
+          TARGETOS: macosx
+          USE_LIBSDL: 0
         run: |
-          ARCHOPTS="${ARCHOPTS} -Wl,-Bstatic -lSDL2 -Wl,-Bdynamic $(sdl2-config --static-libs | awk '{for (i=2; i<NF; i++) printf $i " "; print $NF}')"
-          export ARCHOPTS
+          #ARCHOPTS="${ARCHOPTS} $(sdl2-config --cflags --static-libs | tr '\n' ' ')"
+          #export ARCHOPTS
           make "-j$(sysctl -n hw.physicalcpu)" -r
           file chdman
           otool -L chdman
