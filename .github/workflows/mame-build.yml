@@ -91,6 +91,7 @@ jobs:
 
           # TODO(ccemmer): DEBUG!
           gcc --version
+          compgen -c | sort
       - name: Build
         env:
           OVERRIDE_CC: ${{ matrix.cc || 'gcc' }}
