@@ -38,6 +38,8 @@ env:
 
 jobs:
   build-linux:
+    # gcc-cross/*-linux-gnu/13 seems to have issues as of mame0274
+    # https://github.com/emmercm/chdman-js/actions/runs/13294147953/job/37121892032
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
