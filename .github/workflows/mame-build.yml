@@ -77,6 +77,9 @@ jobs:
           sudo apt-get update --print-uris
           sudo apt-get install --yes git build-essential python3 libsdl2-dev libsdl2-ttf-dev libfontconfig-dev libpulse-dev qtbase5-dev qtbase5-dev-tools qtchooser qt5-qmake \
 
+          # TODO(cemmer): DEBUG!
+          sudo rm /etc/apt/sources.list
+
           sudo apt-get install --yes software-properties-common
           sudo dpkg --add-architecture i386
           sudo add-apt-repository --yes --no-update "deb [arch=amd64,i386] http://archive.ubuntu.com/ubuntu/ $(lsb_release --codename | awk '{print $2}') main multiverse restricted universe"
@@ -93,8 +96,13 @@ jobs:
           sudo apt-get update --print-uris --option APT::Architecture="${{ matrix.apt_architecture }}" --option APT::Architectures="${{ matrix.apt_architecture }}" || true
 
           # TODO(cemmer): DEBUG!
+          echo "----- 1 -----"
           sudo cat /etc/apt/sources.list
+          echo "----- 2 -----"
           sudo cat /etc/apt/sources.list.d/ubuntu.sources
+          echo "----- 3 -----"
+          sudo cat /etc/apt/sources.list.d/archive_uri-http_ports_ubuntu_com_ubuntu-ports_-noble.list
+          echo "----- 4 -----"
           apt-cache madison libsdl2-dev
 
           sudo apt-get install --yes crossbuild-essential-${{ matrix.apt_architecture }} libsdl2-dev:${{ matrix.apt_architecture }}
