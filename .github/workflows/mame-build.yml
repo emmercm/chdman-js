@@ -78,7 +78,8 @@ jobs:
           sudo apt-get install --yes git build-essential python3 libsdl2-dev libsdl2-ttf-dev libfontconfig-dev libpulse-dev qtbase5-dev qtbase5-dev-tools qtchooser qt5-qmake \
 
           # TODO(cemmer): DEBUG!
-          sudo rm /etc/apt/sources.list
+          sudo sed -ie "s/deb /deb [arch=$(dpkg --print-architecture)] /g" /etc/apt/sources.list
+          #sudo rm /etc/apt/sources.list
 
           #sudo apt-get install --yes software-properties-common
           sudo dpkg --add-architecture i386
