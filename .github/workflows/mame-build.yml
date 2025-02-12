@@ -74,7 +74,7 @@ jobs:
           set -x
 
           # https://docs.mamedev.org/initialsetup/compilingmame.html#debian-and-ubuntu-including-raspberry-pi-and-odroid-devices
-          sudo apt-get update
+          sudo apt-get update --print-uris
           sudo apt-get install --yes git build-essential python3 libsdl2-dev libsdl2-ttf-dev libfontconfig-dev libpulse-dev qtbase5-dev qtbase5-dev-tools qtchooser qt5-qmake \
 
           sudo apt-get install --yes software-properties-common
