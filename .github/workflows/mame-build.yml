@@ -136,7 +136,7 @@ jobs:
         run: |
           make "-j$(sysctl -n hw.physicalcpu)" -r
           file chdman
-          ldd chdman
+          otool -L chdman
       - name: Strip binary
         run: |
           ls -al chdman
