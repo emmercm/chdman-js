@@ -5,8 +5,6 @@
 name: MAME Build
 
 on:
-  # TODO(cemmer): DEBUG!
-  push:
   workflow_dispatch:
     inputs:
       mame_ref:
@@ -70,9 +68,6 @@ jobs:
           ref: ${{ env.MAME_REF }}
       - name: Install dependencies
         run: |
-          # TODO(cemmer): DEBUG!
-          set -x
-
           # https://docs.mamedev.org/initialsetup/compilingmame.html#debian-and-ubuntu-including-raspberry-pi-and-odroid-devices
           sudo apt-get update
           sudo apt-get install --yes git build-essential python3 libsdl2-dev libsdl2-ttf-dev libfontconfig-dev libpulse-dev qtbase5-dev qtbase5-dev-tools qtchooser qt5-qmake \
@@ -88,10 +83,6 @@ jobs:
           echo "deb [arch=armhf,arm64,ppc64el,riscv64,s390x] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release --codename | awk '{print $2}')-updates main multiverse restricted universe" | sudo tee -a /etc/apt/sources.list
           sudo apt-get update || true
           sudo apt-get install --yes crossbuild-essential-${{ matrix.apt_architecture }} libsdl2-dev:${{ matrix.apt_architecture }}
-
-          # TODO(ccemmer): DEBUG!
-          gcc --version
-          compgen -c | sort
       - name: Build
         env:
           OVERRIDE_CC: ${{ matrix.cc || 'gcc' }}
