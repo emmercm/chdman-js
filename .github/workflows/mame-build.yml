@@ -91,7 +91,8 @@ jobs:
         env:
           OVERRIDE_CC: ${{ matrix.cc || 'gcc' }}
           OVERRIDE_CXX: ${{ matrix.cxx || 'g++' }}
-          ARCHOPTS: -U_FORTIFY_SOURCE ${{ matrix.archopts }} -Wl,-Bstatic
+          # https://stackoverflow.com/a/69182534
+          ARCHOPTS: -U_FORTIFY_SOURCE ${{ matrix.archopts }} -Wl,-Bstatic -lSDL2 -Wl,-Bdynamic
           TARGETOS: linux
           USE_LIBSDL: 1
         run: |
