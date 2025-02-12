@@ -78,7 +78,9 @@ jobs:
           sudo apt-get install --yes git build-essential python3 libsdl2-dev libsdl2-ttf-dev libfontconfig-dev libpulse-dev qtbase5-dev qtbase5-dev-tools qtchooser qt5-qmake \
 
           # TODO(cemmer): DEBUG!
+          sudo cat /etc/apt/sources.list
           sudo sed -ie "s/deb /deb [arch=$(dpkg --print-architecture)] /g" /etc/apt/sources.list
+          sudo cat /etc/apt/sources.list
           #sudo rm /etc/apt/sources.list
 
           #sudo apt-get install --yes software-properties-common
@@ -109,6 +111,9 @@ jobs:
           apt-cache madison libsdl2-dev
 
           sudo apt-get install --yes crossbuild-essential-${{ matrix.apt_architecture }} libsdl2-dev:${{ matrix.apt_architecture }}
+
+          # TODO(ccemmer): DEBUG!
+          gcc --version
       - name: Build
         env:
           OVERRIDE_CC: ${{ matrix.cc || 'gcc' }}
