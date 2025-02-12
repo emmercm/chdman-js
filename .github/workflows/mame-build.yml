@@ -91,8 +91,9 @@ jobs:
         env:
           OVERRIDE_CC: ${{ matrix.cc || 'gcc' }}
           OVERRIDE_CXX: ${{ matrix.cxx || 'g++' }}
-          # https://stackoverflow.com/a/69182534
-          ARCHOPTS: -U_FORTIFY_SOURCE ${{ matrix.archopts }} -Wl,-Bstatic -lSDL2 -Wl,-Bdynamic
+          # Static compile: https://stackoverflow.com/a/69182534
+          # `sdl2-config --static-libs`: https://stackoverflow.com/a/79131164
+          ARCHOPTS: -U_FORTIFY_SOURCE ${{ matrix.archopts }} -Wl,-Bstatic -lSDL2 -Wl,-Bdynamic -lm -lasound -lm -ldl -lpthread -lpulse -pthread -lsamplerate -lX11 -lXext -lXcursor -lXi -lXfixes -lXrandr -lXss -ldrm -lgbm -lwayland-egl -lwayland-client -lwayland-cursor -lxkbcommon -ldecor-0 -lpthread
           TARGETOS: linux
           USE_LIBSDL: 1
         run: |
