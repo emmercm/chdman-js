@@ -40,7 +40,7 @@ env:
 
 jobs:
   build-linux:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
@@ -48,19 +48,19 @@ jobs:
           - apt_architecture: amd64
             nodejs_arch: x64
           - apt_architecture: i386
-            cc: i686-linux-gnu-gcc-13
-            cxx: i686-linux-gnu-g++-13
+            cc: i686-linux-gnu-gcc-11
+            cxx: i686-linux-gnu-g++-11
             strip: i686-gnu-strip
             nodejs_arch: ia32
           - apt_architecture: armhf
-            cc: arm-linux-gnueabihf-gcc-13
-            cxx: arm-linux-gnueabihf-g++-13
+            cc: arm-linux-gnueabihf-gcc-11
+            cxx: arm-linux-gnueabihf-g++-11
             archopts: -mfpu=neon
             strip: arm-linux-gnueabihf-strip
             nodejs_arch: arm
           - apt_architecture: arm64
-            cc: aarch64-linux-gnu-gcc-13
-            cxx: aarch64-linux-gnu-g++-13
+            cc: aarch64-linux-gnu-gcc-11
+            cxx: aarch64-linux-gnu-g++-11
             strip: aarch64-linux-gnu-strip
             nodejs_arch: arm64
     steps:
