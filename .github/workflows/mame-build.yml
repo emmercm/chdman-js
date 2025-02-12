@@ -91,12 +91,11 @@ jobs:
         env:
           OVERRIDE_CC: ${{ matrix.cc || 'gcc' }}
           OVERRIDE_CXX: ${{ matrix.cxx || 'g++' }}
-          # Static compile: https://stackoverflow.com/a/69182534
-          # `sdl2-config --static-libs`: https://stackoverflow.com/a/79131164
-          ARCHOPTS: -U_FORTIFY_SOURCE ${{ matrix.archopts }} -Wl,-Bstatic -lSDL2 -Wl,-Bdynamic -lm -lasound -lm -ldl -lpthread -lpulse -pthread -lsamplerate -lX11 -lXext -lXcursor -lXi -lXfixes -lXrandr -lXss -ldrm -lgbm -lwayland-egl -lwayland-client -lwayland-cursor -lxkbcommon -ldecor-0 -lpthread
+          ARCHOPTS: -U_FORTIFY_SOURCE ${{ matrix.archopts }}
           TARGETOS: linux
           USE_LIBSDL: 1
         run: |
+          export ARCHOPTS="${ARCHOPTS} -Wl,-Bstatic -lSDL2 -Wl,-Bdynamic $(sdl2-config --static-libs)"
           make "-j$(nproc)" -r
           file chdman
           ldd chdman
@@ -135,6 +134,7 @@ jobs:
         env:
           USE_LIBSDL: 1
         run: |
+          export ARCHOPTS="${ARCHOPTS} -Wl,-Bstatic -lSDL2 -Wl,-Bdynamic $(sdl2-config --static-libs)"
           make "-j$(sysctl -n hw.physicalcpu)" -r
           file chdman
           otool -L chdman
