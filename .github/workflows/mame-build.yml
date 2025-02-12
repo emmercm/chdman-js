@@ -91,7 +91,7 @@ jobs:
         env:
           OVERRIDE_CC: ${{ matrix.cc || 'gcc' }}
           OVERRIDE_CXX: ${{ matrix.cxx || 'g++' }}
-          ARCHOPTS: -U_FORTIFY_SOURCE ${{ matrix.archopts }}
+          ARCHOPTS: -U_FORTIFY_SOURCE ${{ matrix.archopts }} -Wl,-Bstatic
           TARGETOS: linux
           USE_LIBSDL: 1
         run: |
@@ -118,6 +118,7 @@ jobs:
   # https://github.com/mamedev/mame/blob/4505d5459fed086d35f08d7572cb55cd661cd707/.github/workflows/ci-macos.yml
   build-macos:
     strategy:
+      fail-fast: false
       matrix:
         os: [macos-13, macos-14]
     runs-on: ${{ matrix.os }}
