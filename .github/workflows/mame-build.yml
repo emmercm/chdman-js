@@ -35,7 +35,7 @@ env:
   IGNORE_GIT: 1
   NOWERROR: 1
   DEBUG: 0
-  SYMBOLS: 0
+  SYMBOLS:
   OPTIMIZE: s
 
 jobs:
