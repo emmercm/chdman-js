@@ -223,7 +223,7 @@ jobs:
       - uses: actions/setup-node@v4
       - id: bump-and-commit
         run: |
-          package_name=$(jq --raw-output '.name' package.json)
+          package_name=$(jq --raw-output '.name' packages/chdman/package.json)
           major_version=$(npm show "${package_name}" --json | jq --raw-output '.versions | .[]' | sed 's/\.[0-9]*//g' | sort | tail -1)
           # shellcheck disable=SC2001
           minor_version=$(echo "${MAME_REF}" | sed 's/[^0-9]*//g' | sed 's/^0*//')
@@ -249,7 +249,7 @@ jobs:
           echo "USER_NAME=${USER_NAME}" >> "${GITHUB_OUTPUT}"
           git config --global user.name "${USER_NAME}"
 
-          PACKAGE_VERSION="$(jq --raw-output '.version' package.json)"
+          PACKAGE_VERSION="$(jq --raw-output '.version' packages/chdman/package.json)"
           echo "PACKAGE_VERSION=${PACKAGE_VERSION}" >> "${GITHUB_OUTPUT}"
           git commit -m "v${PACKAGE_VERSION}"
         env:

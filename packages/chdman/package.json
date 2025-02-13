@@ -48,8 +48,8 @@
     "bump:major": "npm version major --no-git-tag-version",
     "bump:minor": "npm version minor --no-git-tag-version",
     "bump:patch": "npm version patch --no-git-tag-version",
-    "prepack": "npm run build && cp -f ../../LICENSE ./",
-    "postpack": "rm ./LICENSE"
+    "prepack": "npm run build && cp -f ../../LICENSE ../../README.md ./",
+    "postpack": "rm ./LICENSE ./README.md"
   },
   "dependencies": {
     "which": "^4.0.0"
