@@ -32,8 +32,8 @@ jobs:
           npm whoami
           lerna publish from-package --yes
           {
-            echo "PACKAGE_NAME=$(jq --raw-output '.name' package.json)"
-            echo "PACKAGE_VERSION=$(jq --raw-output '.version' package.json)"
+            echo "PACKAGE_NAME=$(jq --raw-output '.name' packages/chdman/package.json)"
+            echo "PACKAGE_VERSION=$(jq --raw-output '.version' packages/chdman/package.json)"
           } >> "${GITHUB_OUTPUT}"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
