@@ -94,7 +94,7 @@ jobs:
           ARCHOPTS: -U_FORTIFY_SOURCE ${{ matrix.archopts }}
           TARGETOS: linux
         run: |
-          export ARCHOPTS="${ARCHOPTS} -Wl,-rpath,\\\$\$\ORIGIN"
+          export ARCHOPTS="${ARCHOPTS} -Wl,-rpath,\\\$\\\$\ORIGIN"
           make VERBOSE=1 "-j$(nproc)" -r
       - name: Test binary
         run: |
@@ -136,7 +136,7 @@ jobs:
         env:
           USE_LIBSDL: 1
         run: |
-          export ARCHOPTS="${ARCHOPTS} -Wl,-rpath,\\\$\$\ORIGIN"
+          export ARCHOPTS="${ARCHOPTS} -Wl,-rpath,\\\$\\\$\ORIGIN"
           make VERBOSE=1 "-j$(sysctl -n hw.physicalcpu)" -r
       - name: Test binary
         run: |
