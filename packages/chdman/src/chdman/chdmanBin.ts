@@ -1,12 +1,16 @@
 import which from 'which';
-import path from 'node:path';
 import util from 'node:util';
 import fs from 'node:fs';
-import url from 'node:url';
 import * as child_process from 'node:child_process';
 
-export interface ChdmanBinOptions {
+export interface ChdmanRunOptions {
+  binaryPreference?: ChdmanBinaryPreference
   logStd?: boolean
+}
+
+export enum ChdmanBinaryPreference {
+  PREFER_BUNDLED_BINARY = 1,
+  PREFER_PATH_BINARY,
 }
 
 /**
@@ -15,48 +19,51 @@ export interface ChdmanBinOptions {
 export default class ChdmanBin {
   private static CHDMAN_BIN: string | undefined;
 
-  private static async findRoot(filePath = url.fileURLToPath(new URL('.', import.meta.url))): Promise<string | undefined> {
-    const fullPath = path.join(filePath, 'package.json');
-    if (await util.promisify(fs.exists)(fullPath)) {
-      return filePath;
+  private static async getBinPath(
+    binaryPreference?: ChdmanBinaryPreference,
+  ): Promise<string | undefined> {
+    if (this.CHDMAN_BIN) {
+      return this.CHDMAN_BIN;
     }
 
-    const parentPath = path.dirname(filePath);
-    if (parentPath !== filePath) {
-      return this.findRoot(path.dirname(filePath));
+    if ((binaryPreference ?? ChdmanBinaryPreference.PREFER_BUNDLED_BINARY)
+      === ChdmanBinaryPreference.PREFER_BUNDLED_BINARY
+    ) {
+      const pathBundled = await this.getBinPathBundled();
+      this.CHDMAN_BIN = pathBundled ?? (await this.getBinPathExisting());
+    } else {
+      const pathExisting = await this.getBinPathExisting();
+      this.CHDMAN_BIN = pathExisting ?? (await this.getBinPathBundled());
     }
 
-    return undefined;
+    return this.CHDMAN_BIN;
   }
 
-  static async getBinPath(): Promise<string | undefined> {
-    if (ChdmanBin.CHDMAN_BIN) {
-      return ChdmanBin.CHDMAN_BIN;
-    }
-
+  private static async getBinPathBundled(): Promise<string | undefined> {
     try {
       const chdman = await import(`@emmercm/chdman-${process.platform}-${process.arch}`);
       const prebuilt = chdman.default;
       if (await util.promisify(fs.exists)(prebuilt)) {
-        ChdmanBin.CHDMAN_BIN = prebuilt;
         return prebuilt;
       }
     } catch { /* ignored */ }
 
+    return undefined;
+  }
+
+  private static async getBinPathExisting(): Promise<string | undefined> {
     const resolved = await which('chdman', { nothrow: true });
     if (resolved) {
-      ChdmanBin.CHDMAN_BIN = resolved;
       return resolved;
     }
-
     return undefined;
   }
 
   /**
    * Run chdman with some arguments.
    */
-  static async run(arguments_: string[], options?: ChdmanBinOptions): Promise<string> {
-    const chdmanBin = await ChdmanBin.getBinPath();
+  static async run(arguments_: string[], options?: ChdmanRunOptions): Promise<string> {
+    const chdmanBin = await ChdmanBin.getBinPath(options?.binaryPreference);
     if (!chdmanBin) {
       throw new Error('chdman not found');
     }

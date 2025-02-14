@@ -1,10 +1,10 @@
 import util from 'node:util';
 import fs from 'node:fs';
-import ChdmanBin from './chdmanBin.js';
+import ChdmanBin, { ChdmanRunOptions } from './chdmanBin.js';
 import { CHDCompressionAlgorithm } from './common.js';
 import ChdmanInfo from './chdmanInfo.js';
 
-export interface CreateDvdOptions {
+export interface CreateDvdOptions extends ChdmanRunOptions {
   outputFilename: string,
   outputParentFilename?: string,
   force?: boolean,
@@ -13,7 +13,7 @@ export interface CreateDvdOptions {
   numProcessors?: number
 }
 
-export interface ExtractDvdOptions {
+export interface ExtractDvdOptions extends ChdmanRunOptions {
   outputFilename: string,
   outputBinFilename?: string,
   force?: boolean,
@@ -38,7 +38,7 @@ export default {
           ? []
           : ['--compression', Array.isArray(options.compression) ? options.compression.join(',') : options.compression]),
         ...(options.numProcessors === undefined ? [] : ['--numprocessors', String(options.numProcessors)]),
-      ]);
+      ], options);
     } catch (error) {
       // chdman can leave cruft when it fails
       if (!existedBefore) {
@@ -68,6 +68,6 @@ export default {
       ...(options.force === true ? ['--force'] : []),
       '--input', options.inputFilename,
       ...(options.inputParentFilename ? ['--inputparent', options.inputParentFilename] : []),
-    ]);
+    ], options);
   },
 };
