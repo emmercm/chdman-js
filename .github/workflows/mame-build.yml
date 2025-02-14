@@ -95,6 +95,7 @@ jobs:
           TARGETOS: linux
         run: |
           export LDFLAGS="${LDFLAGS} -Wl,-rpath=\$\$ORIGIN"
+          export ORIGIN='$ORIGIN'
           make "-j$(nproc)" -r
       - name: Test binary
         run: |
@@ -135,6 +136,7 @@ jobs:
           USE_LIBSDL: 1
         run: |
           export LDFLAGS="${LDFLAGS} -Wl,-rpath=\$\$ORIGIN"
+          export ORIGIN='$ORIGIN'
           make "-j$(sysctl -n hw.physicalcpu)" -r
       - name: Test binary
         run: |
