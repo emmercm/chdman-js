@@ -35,7 +35,7 @@ env:
   IGNORE_GIT: 1
   NOWERROR: 1
   DEBUG: 0
-  SYMBOLS:
+  SYMBOLS: 0
   OPTIMIZE: s
 
 jobs:
@@ -93,9 +93,11 @@ jobs:
           OVERRIDE_CXX: ${{ matrix.cxx || 'g++' }}
           ARCHOPTS: -U_FORTIFY_SOURCE ${{ matrix.archopts }} -Wl,-rpath='\$ORIGIN'
           TARGETOS: linux
+        run: make "-j$(nproc)" -r
+      - name: Test binary
         run: |
-          make "-j$(nproc)" -r
           file chdman
+          ldd chdman
       - name: Strip binary
         run: |
           sudo apt-get install --yes binutils binutils-i686-gnu binutils-arm-linux-gnueabihf binutils-aarch64-linux-gnu
@@ -130,9 +132,11 @@ jobs:
         env:
           ARCHOPTS: -Wl,-rpath='\$ORIGIN'
           USE_LIBSDL: 1
+        run: make "-j$(sysctl -n hw.physicalcpu)" -r
+      - name: Test binary
         run: |
-          make "-j$(sysctl -n hw.physicalcpu)" -r
           file chdman
+          otool -L chdman
       - name: Strip binary
         run: |
           ls -al chdman
