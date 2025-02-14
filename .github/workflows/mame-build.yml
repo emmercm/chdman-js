@@ -94,9 +94,11 @@ jobs:
           ARCHOPTS: -U_FORTIFY_SOURCE ${{ matrix.archopts }}
           LDFLAGS: -Wl,-rpath,\\\$\$ORIGIN
           TARGETOS: linux
-        run: make "-j$(nproc)" -r
+        run: make --debug=j "-j$(nproc)" -r
       - name: Test binary
         run: |
+          set -x
+          ./chdman --help
           file chdman
           ldd chdman
       - name: Strip binary
@@ -133,9 +135,11 @@ jobs:
         env:
           LDFLAGS: -Wl,-rpath,\\\$\$ORIGIN
           USE_LIBSDL: 1
-        run: make "-j$(sysctl -n hw.physicalcpu)" -r
+        run: make --debug=j "-j$(sysctl -n hw.physicalcpu)" -r
       - name: Test binary
         run: |
+          set -x
+          ./chdman --help
           file chdman
           otool -L chdman
       - name: Strip binary
@@ -201,6 +205,9 @@ jobs:
           OVERRIDE_CXX: clang++
           ARCHOPTS: "-fuse-ld=lld"
         run: make -j$(nproc) -r
+      - name: Test binary
+        run: |
+          chdman.exe --help
       - name: Strip binary
         run: |
           ls -al chdman.exe
