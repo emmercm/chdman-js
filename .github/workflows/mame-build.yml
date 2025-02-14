@@ -91,10 +91,12 @@ jobs:
         env:
           OVERRIDE_CC: ${{ matrix.cc || 'gcc' }}
           OVERRIDE_CXX: ${{ matrix.cxx || 'g++' }}
-          ARCHOPTS: -U_FORTIFY_SOURCE ${{ matrix.archopts }} -Wl,-rpath='$ORIGIN'
-          O: $O
+          ARCHOPTS: -U_FORTIFY_SOURCE ${{ matrix.archopts }}
           TARGETOS: linux
-        run: make "-j$(nproc)" -r
+        run: |
+          ARCHOPTS="${ARCHOPTS} -Wl,-rpath='\$ORIGIN'"
+          export ARCHOPTS
+          make "-j$(nproc)" -r
       - name: Test binary
         run: |
           file chdman
@@ -131,10 +133,11 @@ jobs:
         run: brew install --overwrite python3 sdl2
       - name: Build
         env:
-          ARCHOPTS: -Wl,-rpath='$ORIGIN'
-          O: $O
           USE_LIBSDL: 1
-        run: make "-j$(sysctl -n hw.physicalcpu)" -r
+        run: |
+          ARCHOPTS="${ARCHOPTS} -Wl,-rpath='\$ORIGIN'"
+          export ARCHOPTS
+          make "-j$(sysctl -n hw.physicalcpu)" -r
       - name: Test binary
         run: |
           file chdman
