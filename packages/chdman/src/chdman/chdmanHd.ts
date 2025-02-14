@@ -1,10 +1,10 @@
 import util from 'node:util';
 import fs from 'node:fs';
-import ChdmanBin from './chdmanBin.js';
+import ChdmanBin, { ChdmanRunOptions } from './chdmanBin.js';
 import { CHDCompressionAlgorithm } from './common.js';
 import ChdmanInfo from './chdmanInfo.js';
 
-export interface CreateHdOptions {
+export interface CreateHdOptions extends ChdmanRunOptions {
   outputFilename: string,
   outputParentFilename?: string,
   force?: boolean,
@@ -23,7 +23,7 @@ export interface CreateHdOptions {
   numProcessors?: number
 }
 
-export interface ExtractHdOptions {
+export interface ExtractHdOptions extends ChdmanRunOptions {
   outputFilename: string,
   force?: boolean,
   inputFilename: string,
@@ -61,7 +61,7 @@ export default {
         ...(options.size === undefined ? [] : ['--size', String(options.size)]),
         ...(options.sectorSize === undefined ? [] : ['--sectorsize', String(options.sectorSize)]),
         ...(options.numProcessors === undefined ? [] : ['--numprocessors', String(options.numProcessors)]),
-      ]);
+      ], options);
     } catch (error) {
       // chdman can leave cruft when it fails
       if (!existedBefore) {
@@ -94,6 +94,6 @@ export default {
       ...(options.inputStartHunk === undefined ? [] : ['--inputstarthunk', String(options.inputStartHunk)]),
       ...(options.inputBytes === undefined ? [] : ['--inputbytes', String(options.inputBytes)]),
       ...(options.inputHunks === undefined ? [] : ['--inputhunks', String(options.inputHunks)]),
-    ]);
+    ], options);
   },
 };

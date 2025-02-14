@@ -1,9 +1,9 @@
 import util from 'node:util';
 import fs from 'node:fs';
-import ChdmanBin from './chdmanBin.js';
+import ChdmanBin, { ChdmanRunOptions } from './chdmanBin.js';
 import { CHDType, CHDCompressionAlgorithm } from './common.js';
 
-export interface InfoOptions {
+export interface InfoOptions extends ChdmanRunOptions {
   inputFilename: string,
 }
 
@@ -46,7 +46,7 @@ export default {
       'info',
       '--input', options.inputFilename,
       '--verbose',
-    ]);
+    ], options);
 
     // Try to detect failures, and then retry them automatically
     if (!output.trim() && attempt <= 3) {

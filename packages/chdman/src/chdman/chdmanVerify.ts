@@ -1,6 +1,6 @@
-import ChdmanBin from './chdmanBin.js';
+import ChdmanBin, { ChdmanRunOptions } from './chdmanBin.js';
 
-export interface VerifyOptions {
+export interface VerifyOptions extends ChdmanRunOptions {
   inputFilename: string,
   inputParentFilename?: string,
 }
@@ -12,7 +12,7 @@ export default {
         'verify',
         '--input', options.inputFilename,
         ...(options.inputParentFilename ? ['--inputparent', options.inputParentFilename] : []),
-      ]);
+      ], options);
       return true;
     } catch {
       return false;
