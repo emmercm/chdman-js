@@ -93,9 +93,10 @@ jobs:
           OVERRIDE_CXX: ${{ matrix.cxx || 'g++' }}
           ARCHOPTS: -U_FORTIFY_SOURCE ${{ matrix.archopts }}
           TARGETOS: linux
+        run: make VERBOSE=1 "-j$(nproc)" -r
+      - name: Make portable
         run: |
-          export ARCHOPTS="${ARCHOPTS} -Wl,-rpath,\\\$\\\$\ORIGIN"
-          make VERBOSE=1 "-j$(nproc)" -r
+          echo hello
       - name: Test binary
         run: |
           set -x
@@ -135,9 +136,14 @@ jobs:
       - name: Build
         env:
           USE_LIBSDL: 1
+        run: make VERBOSE=1 "-j$(sysctl -n hw.physicalcpu)" -r
+      - name: Make portable
         run: |
-          export ARCHOPTS="${ARCHOPTS} -Wl,-rpath,\\\$\\\$\ORIGIN"
-          make VERBOSE=1 "-j$(sysctl -n hw.physicalcpu)" -r
+          otool -L chdman | awk '{print $1}' | grep -E "^$(brew --prefix)" | while read -r file; do
+            cp "${file}" ./
+            install_name_tool -change "${file}" "@executable_path/$(basename "${file}")" chdman
+          done
+          brew uninstall sdl2
       - name: Test binary
         run: |
           set -x
