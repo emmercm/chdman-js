@@ -92,7 +92,7 @@ jobs:
           OVERRIDE_CC: ${{ matrix.cc || 'gcc' }}
           OVERRIDE_CXX: ${{ matrix.cxx || 'g++' }}
           ARCHOPTS: -U_FORTIFY_SOURCE ${{ matrix.archopts }} -Wl,-rpath='$ORIGIN'
-          ORIGIN: $ORIGIN
+          O: $O
           TARGETOS: linux
         run: make "-j$(nproc)" -r
       - name: Test binary
@@ -132,7 +132,7 @@ jobs:
       - name: Build
         env:
           ARCHOPTS: -Wl,-rpath='$ORIGIN'
-          ORIGIN: $ORIGIN
+          O: $O
           USE_LIBSDL: 1
         run: make "-j$(sysctl -n hw.physicalcpu)" -r
       - name: Test binary
