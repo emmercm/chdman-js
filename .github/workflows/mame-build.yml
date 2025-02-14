@@ -94,7 +94,7 @@ jobs:
           ARCHOPTS: -U_FORTIFY_SOURCE ${{ matrix.archopts }}
           TARGETOS: linux
         run: |
-          export LDFLAGS="${LDFLAGS} -Wl,-rpath=\\\$\$ORIGIN"
+          export LDFLAGS="${LDFLAGS} -Wl,-rpath,\\\$\$ORIGIN"
           make "-j$(nproc)" -r
       - name: Test binary
         run: |
@@ -134,7 +134,7 @@ jobs:
         env:
           USE_LIBSDL: 1
         run: |
-          export LDFLAGS="${LDFLAGS} -Wl,-rpath=\\\$\$ORIGIN"
+          export LDFLAGS="${LDFLAGS} -Wl,-rpath,\\\$\$ORIGIN"
           make "-j$(sysctl -n hw.physicalcpu)" -r
       - name: Test binary
         run: |
