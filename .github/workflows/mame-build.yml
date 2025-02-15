@@ -93,16 +93,12 @@ jobs:
           OVERRIDE_CXX: ${{ matrix.cxx || 'g++' }}
           ARCHOPTS: -U_FORTIFY_SOURCE ${{ matrix.archopts }}
           TARGETOS: linux
-        run: make VERBOSE=1 "-j$(nproc)" -r
-      - name: Make portable
-        run: |
-          echo hello
+        run: make "-j$(nproc)" -r
       - name: Test binary
         run: |
           set -x
-          ./chdman --help || true
           file chdman
-          ldd chdman
+          readelf -d chdman | grep NEEDED
       - name: Strip binary
         run: |
           sudo apt-get install --yes binutils binutils-i686-gnu binutils-arm-linux-gnueabihf binutils-aarch64-linux-gnu
@@ -136,7 +132,7 @@ jobs:
       - name: Build
         env:
           USE_LIBSDL: 1
-        run: make VERBOSE=1 "-j$(sysctl -n hw.physicalcpu)" -r
+        run: make "-j$(sysctl -n hw.physicalcpu)" -r
       - name: Make portable
         run: |
           otool -L chdman | awk '{print $1}' | grep -E "^$(brew --prefix)" | while read -r file; do
@@ -165,7 +161,9 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ runner.os }}-${{ matrix.os }}-${{ github.sha }}
-          path: artifacts/**/chdman
+          path: |
+            artifacts/**/chdman
+            artifacts/**/*.dylib
           if-no-files-found: error
 
   # https://github.com/mamedev/mame/blob/4505d5459fed086d35f08d7572cb55cd661cd707/.github/workflows/ci-windows.yml
@@ -215,7 +213,7 @@ jobs:
         run: make VERBOSE=1 -j$(nproc) -r
       - name: Test binary
         run: |
-          chdman.exe --help
+          .\chdman.exe --help
       - name: Strip binary
         run: |
           ls -al chdman.exe
