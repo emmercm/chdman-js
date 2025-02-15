@@ -213,7 +213,7 @@ jobs:
         run: make VERBOSE=1 -j$(nproc) -r
       - name: Test binary
         run: |
-          .\chdman.exe --help
+          ./chdman.exe --help
       - name: Strip binary
         run: |
           ls -al chdman.exe
