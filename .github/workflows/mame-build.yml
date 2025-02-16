@@ -5,6 +5,8 @@
 name: MAME Build
 
 on:
+  # TODO(cemmer): DEBUG!
+  push:
   workflow_dispatch:
     inputs:
       mame_ref:
@@ -108,6 +110,7 @@ jobs:
           dir="artifacts/packages/chdman-linux-${{ matrix.nodejs_arch }}"
           mkdir -p "${dir}"
           mv chdman "${dir}/"
+          ls -al "${dir}/"
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ runner.os }}-${{ matrix.apt_architecture }}-${{ github.sha }}
@@ -155,7 +158,8 @@ jobs:
           # shellcheck disable=SC2016
           dir="artifacts/packages/chdman-$(node --eval 'console.log(`${process.platform}-${process.arch}`)')"
           mkdir -p "${dir}"
-          mv chdman *.dylib "${dir}/"
+          mv chdman ./*.dylib "${dir}/"
+          ls -al "${dir}/"
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ runner.os }}-${{ matrix.os }}-${{ github.sha }}
@@ -222,6 +226,7 @@ jobs:
           dir="artifacts/packages/chdman-win32-${{ matrix.nodejs_arch }}"
           mkdir -p "${dir}"
           mv chdman.exe "${dir}/"
+          ls -al "${dir}/"
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ runner.os }}-${{ matrix.msystem }}-${{ github.sha }}
