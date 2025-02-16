@@ -119,7 +119,7 @@ jobs:
   build-macos:
     strategy:
       matrix:
-        os: [macos-13, macos-14]
+        os: [macos-13, macos-15]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -134,6 +134,7 @@ jobs:
         run: make "-j$(sysctl -n hw.physicalcpu)" -r
       - name: Make portable
         run: |
+          set -x
           otool -L chdman | awk '{print $1}' | grep -E "^$(brew --prefix)" | while read -r file; do
             cp "${file}" ./
             install_name_tool -change "${file}" "@executable_path/$(basename "${file}")" chdman
@@ -239,6 +240,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Delete old macoS .dylibs
+        run: |
+          rm packages/*-darwin-*/*.dylib
       - uses: actions/download-artifact@v4
         with:
           merge-multiple: true
