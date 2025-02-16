@@ -5,8 +5,6 @@
 name: MAME Build
 
 on:
-  # TODO(cemmer): DEBUG!
-  push:
   workflow_dispatch:
     inputs:
       mame_ref:
