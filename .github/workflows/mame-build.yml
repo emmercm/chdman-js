@@ -155,7 +155,7 @@ jobs:
           # shellcheck disable=SC2016
           dir="artifacts/packages/chdman-$(node --eval 'console.log(`${process.platform}-${process.arch}`)')"
           mkdir -p "${dir}"
-          mv chdman "${dir}/"
+          mv chdman *.dylib "${dir}/"
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ runner.os }}-${{ matrix.os }}-${{ github.sha }}
