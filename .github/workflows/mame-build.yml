@@ -262,7 +262,7 @@ jobs:
           lerna version "${new_version}" --yes || true
 
           chmod +x packages/chdman-*-*/chdman*
-          ls -alR
+          ls -lR
           git add package*.json lerna.json packages
 
           USER_EMAIL="${GITHUB_ACTOR_ID}+${GITHUB_ACTOR}@users.noreply.github.com"
