@@ -18,7 +18,7 @@
     "provenance": true
   },
   "scripts": {
-    "build": "tsc --build --verbose && cp chdman* dist/",
+    "build": "tsc --build --verbose && cp chdman *.dylib dist/",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "prepack": "npm run build && cp -f ../../LICENSE ../../README.md ./",
