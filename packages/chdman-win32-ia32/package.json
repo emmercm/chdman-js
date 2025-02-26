@@ -1,6 +1,6 @@
 {
   "name": "@emmercm/chdman-win32-ia32",
-  "version": "0.274.2",
+  "version": "0.275.0",
   "os": [
     "win32"
   ],
