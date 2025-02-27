@@ -52,7 +52,10 @@ export default class ChdmanBin {
   }
 
   private static async getBinPathExisting(): Promise<string | undefined> {
-    const resolved = await which('chdman', { nothrow: true });
+    const resolved = await which(
+      process.platform === 'win32' ? 'chdman.exe' : 'chdman',
+      { nothrow: true },
+    );
     if (resolved) {
       return resolved;
     }
