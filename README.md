@@ -51,7 +51,7 @@ await chdman.createHd({
   inputFilename: 'original-image',
   outputFilename: 'image.chd',
 });
-console.log(await chdman.info('image.chd'));
+console.log(await chdman.info({ inputFilename: 'image.chd' }));
 // { inputFile: 'image.chd', fileVersion: 5, ... }
 await chdman.extractHd({
   inputFilename: 'image.chd',
@@ -66,7 +66,7 @@ await chdman.createCd({
   inputFilename: 'Original.cue',
   outputFilename: 'CD.chd',
 });
-console.log(await chdman.info('CD.chd'));
+console.log(await chdman.info({ inputFilename: 'CD.chd' }));
 // { inputFile: 'CD.chd', fileVersion: 5, ... }
 await chdman.extractCd({
   inputFilename: 'CD.chd',
@@ -82,7 +82,7 @@ await chdman.createDvd({
   inputFilename: 'Original.iso',
   outputFilename: 'DVD.chd',
 });
-console.log(await chdman.info('DVD.chd'));
+console.log(await chdman.info({ inputFilename: 'DVD.chd' }));
 // { inputFile: 'DVD.chd', fileVersion: 5, ... }
 await chdman.extractDvd({
   inputFilename: 'DVD.chd',
