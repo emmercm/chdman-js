@@ -4,7 +4,7 @@ export interface HelpOptions extends ChdmanRunOptions {}
 
 export default {
   /**
-   * Return info about a CHD file.
+   * Returns the chdman help message.
    */
   async help(options?: HelpOptions, attempt = 1): Promise<string> {
     const output = await ChdmanBin.run(['help']);

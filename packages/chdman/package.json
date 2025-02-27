@@ -3,6 +3,7 @@
   "version": "0.275.0",
   "description": "💿 chdman binaries and wrapper for Node.js.",
   "keywords": [
+    "chd",
     "chdman",
     "isos",
     "mame",
