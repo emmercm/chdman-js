@@ -1,6 +1,6 @@
 {
   "name": "chdman",
-  "version": "0.275.1",
+  "version": "0.276.0",
   "description": "💿 chdman binaries and wrapper for Node.js.",
   "keywords": [
     "chd",
@@ -56,14 +56,14 @@
     "which": "^4.0.0"
   },
   "optionalDependencies": {
-    "@emmercm/chdman-darwin-arm64": "^0.275.1",
-    "@emmercm/chdman-darwin-x64": "^0.275.1",
-    "@emmercm/chdman-linux-arm": "^0.275.1",
-    "@emmercm/chdman-linux-arm64": "^0.275.1",
-    "@emmercm/chdman-linux-ia32": "^0.275.1",
-    "@emmercm/chdman-linux-x64": "^0.275.1",
-    "@emmercm/chdman-win32-ia32": "^0.275.1",
-    "@emmercm/chdman-win32-x64": "^0.275.1"
+    "@emmercm/chdman-darwin-arm64": "^0.276.0",
+    "@emmercm/chdman-darwin-x64": "^0.276.0",
+    "@emmercm/chdman-linux-arm": "^0.276.0",
+    "@emmercm/chdman-linux-arm64": "^0.276.0",
+    "@emmercm/chdman-linux-ia32": "^0.276.0",
+    "@emmercm/chdman-linux-x64": "^0.276.0",
+    "@emmercm/chdman-win32-ia32": "^0.276.0",
+    "@emmercm/chdman-win32-x64": "^0.276.0"
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",
