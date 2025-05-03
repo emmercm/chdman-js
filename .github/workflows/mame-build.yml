@@ -135,6 +135,7 @@ jobs:
       - name: Make portable
         run: |
           set -x
+          otool -L chdman
           otool -L chdman | awk '{print $1}' | grep -E "^$(brew --prefix)" | while read -r file; do
             cp "${file}" ./
             install_name_tool -change "${file}" "@executable_path/$(basename "${file}")" chdman
