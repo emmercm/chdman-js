@@ -71,6 +71,16 @@ export default class ChdmanBin {
       throw new Error('chdman not found');
     }
 
+    const inputIndex = arguments_.indexOf('--input');
+    if (inputIndex !== -1 && (inputIndex + 1) < arguments_.length) {
+      const inputPath = arguments_[inputIndex + 1];
+      try {
+        await util.promisify(fs.stat)(inputPath);
+      } catch {
+        throw new Error(`input file '${inputPath}' not found`);
+      }
+    }
+
     // if (process.platform === 'darwin'
     // && !fs.existsSync(path.join('Library', 'Frameworks', 'SDL2.framework'))) {
     //   throw new Error('chdman requires the SDL2 framework to be installed on macOS');

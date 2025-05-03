@@ -1,6 +1,6 @@
 {
   "name": "chdman",
-  "version": "0.275.1",
+  "version": "0.276.0",
   "description": "💿 chdman binaries and wrapper for Node.js.",
   "keywords": [
     "chd",
@@ -56,23 +56,25 @@
     "which": "^4.0.0"
   },
   "optionalDependencies": {
-    "@emmercm/chdman-darwin-arm64": "^0.275.1",
-    "@emmercm/chdman-darwin-x64": "^0.275.1",
-    "@emmercm/chdman-linux-arm": "^0.275.1",
-    "@emmercm/chdman-linux-arm64": "^0.275.1",
-    "@emmercm/chdman-linux-ia32": "^0.275.1",
-    "@emmercm/chdman-linux-x64": "^0.275.1",
-    "@emmercm/chdman-win32-ia32": "^0.275.1",
-    "@emmercm/chdman-win32-x64": "^0.275.1"
+    "@emmercm/chdman-darwin-arm64": "^0.276.0",
+    "@emmercm/chdman-darwin-x64": "^0.276.0",
+    "@emmercm/chdman-linux-arm": "^0.276.0",
+    "@emmercm/chdman-linux-arm64": "^0.276.0",
+    "@emmercm/chdman-linux-ia32": "^0.276.0",
+    "@emmercm/chdman-linux-x64": "^0.276.0",
+    "@emmercm/chdman-win32-ia32": "^0.276.0",
+    "@emmercm/chdman-win32-x64": "^0.276.0"
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",
     "@types/node": "^20.11.24",
     "@types/which": "^3.0.3",
     "@typescript-eslint/eslint-plugin": "^7.1.0",
+    "@typescript-eslint/parser": "^8.31.1",
     "auto-changelog": "^2.4.0",
     "eslint": "^8.57.0",
     "eslint-config-airbnb-typescript": "^18.0.0",
+    "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-jest": "^27.9.0",
     "eslint-plugin-jsdoc": "^48.2.0",
     "eslint-plugin-simple-import-sort": "^12.0.0",
