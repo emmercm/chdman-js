@@ -18,9 +18,9 @@ it('should fail on nonexistent file', async () => {
       hunkSize: 64,
       unitSize: 64,
     })).rejects.toBeTruthy();
-    // await expect(ChdmanInfo.info({
-    //   inputFilename: temporaryRaw,
-    // })).rejects.toBeTruthy();
+    await expect(ChdmanInfo.info({
+      inputFilename: temporaryRaw,
+    })).rejects.toBeTruthy();
     await expect(ChdmanRaw.extractRaw({
       inputFilename: temporaryChd,
       outputFilename: temporaryRaw,
