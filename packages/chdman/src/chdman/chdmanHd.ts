@@ -39,7 +39,14 @@ export default {
    * Create a hard disk CHD.
    */
   async createHd(options: CreateHdOptions): Promise<void> {
-    const existedBefore = await util.promisify(fs.exists)(options.outputFilename);
+    let existedBefore: boolean;
+    try {
+      await util.promisify(fs.stat)(options.outputFilename);
+      existedBefore = true;
+    } catch {
+      existedBefore = false;
+    }
+
     try {
       await ChdmanBin.run([
         'createhd',

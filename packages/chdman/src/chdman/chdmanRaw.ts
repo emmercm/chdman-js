@@ -32,7 +32,14 @@ export interface ExtractRawOptions extends ChdmanRunOptions {
 
 export default {
   async createRaw(options: CreateRawOptions): Promise<void> {
-    const existedBefore = await util.promisify(fs.exists)(options.outputFilename);
+    let existedBefore: boolean;
+    try {
+      await util.promisify(fs.stat)(options.outputFilename);
+      existedBefore = true;
+    } catch {
+      existedBefore = false;
+    }
+
     try {
       await ChdmanBin.run([
         'createraw',

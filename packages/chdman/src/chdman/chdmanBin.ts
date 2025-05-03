@@ -43,9 +43,10 @@ export default class ChdmanBin {
     try {
       const chdman = await import(`@emmercm/chdman-${process.platform}-${process.arch}`);
       const prebuilt = chdman.default;
-      if (await util.promisify(fs.exists)(prebuilt)) {
+      try {
+        await util.promisify(fs.stat)(prebuilt);
         return prebuilt;
-      }
+      } catch { /* ignored */ }
     } catch { /* ignored */ }
 
     return undefined;
@@ -77,7 +78,7 @@ export default class ChdmanBin {
       try {
         await util.promisify(fs.stat)(inputPath);
       } catch {
-        throw new Error(`input file '${inputPath}' not found`);
+        throw new Error(`input file doesn't exist: ${inputPath}`);
       }
     }
 
