@@ -38,7 +38,9 @@ export default {
    * Return info about a CHD file.
    */
   async info(options: InfoOptions, attempt = 1): Promise<CHDInfo> {
-    if (!await util.promisify(fs.exists)(options.inputFilename)) {
+    try {
+      await util.promisify(fs.stat)(options.inputFilename);
+    } catch {
       throw new Error(`input file doesn't exist: ${options.inputFilename}`);
     }
 

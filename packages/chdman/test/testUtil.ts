@@ -7,7 +7,12 @@ export default {
    * Asynchronously check the existence of a file.
    */
   async exists(pathLike: PathLike): Promise<boolean> {
-    return util.promisify(fs.exists)(pathLike);
+    try {
+      await util.promisify(fs.stat)(pathLike);
+      return true;
+    } catch {
+      return false;
+    }
   },
 
   /**
