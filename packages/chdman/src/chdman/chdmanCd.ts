@@ -27,7 +27,14 @@ export default {
    * Create a CD CHD.
    */
   async createCd(options: CreateCdOptions): Promise<void> {
-    const existedBefore = await util.promisify(fs.exists)(options.outputFilename);
+    let existedBefore: boolean;
+    try {
+      await util.promisify(fs.stat)(options.outputFilename);
+      existedBefore = true;
+    } catch {
+      existedBefore = false;
+    }
+
     try {
       await ChdmanBin.run([
         'createcd',
