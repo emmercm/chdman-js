@@ -35,8 +35,6 @@ test.each([
   [path.join('test', 'fixtures', 'cue', 'multiple.cue'), 14_688, Math.floor((4704 + 7056 + 3000) / 2352) * 2352],
 ])('should create, info, and extract: %s', async (cue, hunkSize, expectedBinSize) => {
   const temporaryChd = `${await TestUtil.mktemp(path.join(os.tmpdir(), path.basename(cue)))}.chd`;
-  const temporaryCue = `${temporaryChd}.cue`;
-  const temporaryBin = `${temporaryChd}.bin`;
 
   try {
     await ChdmanCd.createCd({
@@ -63,17 +61,39 @@ test.each([
     expect(info.dataSha1).toBeTruthy();
     expect(info.type).toEqual(CHDType.CD_ROM);
 
-    await ChdmanCd.extractCd({
-      inputFilename: temporaryChd,
-      outputFilename: temporaryCue,
-      outputBinFilename: temporaryBin,
-    });
-    await expect(TestUtil.exists(temporaryCue)).resolves.toEqual(true);
-    const temporaryBinStat = await util.promisify(fs.stat)(temporaryBin);
-    expect(temporaryBinStat.size).toEqual(expectedBinSize);
+    const temporaryMergedCue = `${temporaryChd}.cue`;
+    const temporaryMergedBin = `${temporaryChd}.bin`;
+    try {
+      await ChdmanCd.extractCd({
+        inputFilename: temporaryChd,
+        outputFilename: temporaryMergedCue,
+        outputBinFilename: temporaryMergedBin,
+      });
+      await expect(TestUtil.exists(temporaryMergedCue)).resolves.toEqual(true);
+      const temporaryBinStat = await util.promisify(fs.stat)(temporaryMergedBin);
+      expect(temporaryBinStat.size).toEqual(expectedBinSize);
+    } finally {
+      await util.promisify(fs.rm)(temporaryMergedCue, { force: true });
+      await util.promisify(fs.rm)(temporaryMergedBin, { force: true });
+    }
+
+    const temporarySplitCue = `${temporaryChd}.cue`;
+    const temporarySplitBin = `${temporaryChd} (Track %t).bin`;
+    try {
+      await ChdmanCd.extractCd({
+        inputFilename: temporaryChd,
+        outputFilename: temporarySplitCue,
+        outputBinFilename: temporarySplitBin,
+        splitBin: true,
+      });
+      await expect(TestUtil.exists(temporarySplitCue)).resolves.toEqual(true);
+      // TODO(cemmer): a stronger test than this for split bins
+      await expect(TestUtil.exists(temporarySplitBin.replace('%t', '1'))).resolves.toEqual(true);
+    } finally {
+      await util.promisify(fs.rm)(temporarySplitCue, { force: true });
+      await util.promisify(fs.rm)(temporarySplitBin, { force: true });
+    }
   } finally {
     await util.promisify(fs.rm)(temporaryChd, { force: true });
-    await util.promisify(fs.rm)(temporaryCue, { force: true });
-    await util.promisify(fs.rm)(temporaryBin, { force: true });
   }
 });
