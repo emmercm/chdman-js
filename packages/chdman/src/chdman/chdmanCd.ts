@@ -17,6 +17,7 @@ export interface CreateCdOptions extends ChdmanRunOptions {
 export interface ExtractCdOptions extends ChdmanRunOptions {
   outputFilename: string,
   outputBinFilename?: string,
+  splitBin?: boolean, // added in v0.265 (https://github.com/mamedev/mame/commit/79c1ae350d07b2c7516e4d2652453cb955067814)
   force?: boolean,
   inputFilename: string,
   inputParentFilename?: string,
@@ -77,6 +78,7 @@ export default {
       'extractcd',
       '--output', options.outputFilename,
       ...(options.outputBinFilename ? ['--outputbin', options.outputBinFilename] : []),
+      ...(options.splitBin ? ['--splitbin'] : []),
       ...(options.force === true ? ['--force'] : []),
       '--input', options.inputFilename,
       ...(options.inputParentFilename ? ['--inputparent', options.inputParentFilename] : []),
