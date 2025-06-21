@@ -112,6 +112,11 @@ export default class ChdmanBin {
           proc.kill();
           killed = true;
         }
+        if (/([2-9]|\d\d)\d\d\.\d+%/.test(chunk.toString())) {
+          // chdman can waste a lot of time extracting bad files
+          proc.kill();
+          killed = true;
+        }
       });
 
       proc.on('close', (code) => {
