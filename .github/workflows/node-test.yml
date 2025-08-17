@@ -51,6 +51,7 @@ jobs:
     if: ${{ needs.path-filter.outputs.changes == 'true' }}
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ ubuntu-24.04, ubuntu-24.04-arm, macos-13, macos-15, windows-latest ]
         node-version:
