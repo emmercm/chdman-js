@@ -102,7 +102,12 @@ jobs:
           set -x
 
           # Only build chdman
-          gawk --include inplace '!/scripts.*osd/' makefile
+          gawk --include inplace '!/^[[:space:]]*scripts\/.*emu/' makefile
+          gawk --include inplace '!/^[[:space:]]*scripts\/.*frontend/' makefile
+          gawk --include inplace '!/^[[:space:]]*scripts\/.*main/' makefile
+          gawk --include inplace '!/^[[:space:]]*scripts\/.*netlist/' makefile
+          gawk --include inplace '!/^[[:space:]]*scripts\/.*osd/' makefile
+          gawk --include inplace '!/^[[:space:]]*scripts\/.*video/' makefile
           gawk --include inplace '/^-- chdman/{flag=1; next} /^-- /{flag=0} flag' scripts/src/tools.lua
 
           make "-j$(nproc)" -r || if [[ ! -f chdman ]]; then exit 1; fi
@@ -117,7 +122,7 @@ jobs:
           set -x
           file chdman
           readelf -d chdman | grep NEEDED
-          if readelf -d dolphin-tool | grep NEEDED | grep -q 'libSDL2'; then exit 1; fi
+          if readelf -d chdman | grep NEEDED | grep -q 'libSDL2'; then exit 1; fi
       - name: Rename binary
         run: |
           dir="artifacts/packages/chdman-linux-${{ matrix.nodejs_arch }}"
