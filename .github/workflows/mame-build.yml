@@ -71,6 +71,8 @@ jobs:
           ref: ${{ env.MAME_REF }}
       - name: Install dependencies
         run: |
+          set -x
+
           # https://docs.mamedev.org/initialsetup/compilingmame.html#debian-and-ubuntu-including-raspberry-pi-and-odroid-devices
           sudo apt-get update
           sudo apt-get install --yes git build-essential python3 libsdl2-dev libsdl2-ttf-dev libfontconfig-dev libpulse-dev qtbase5-dev qtbase5-dev-tools qtchooser qt5-qmake \
@@ -96,17 +98,18 @@ jobs:
           ARCHOPTS: -U_FORTIFY_SOURCE ${{ matrix.archopts }}
           TARGETOS: linux
         run: make "-j$(nproc)" -r
-      - name: Test binary
-        run: |
-          set -x
-          file chdman
-          readelf -d chdman | grep NEEDED
       - name: Strip binary
         run: |
           sudo apt-get install --yes binutils binutils-i686-gnu binutils-arm-linux-gnueabihf binutils-aarch64-linux-gnu
           ls -al chdman
           ${{ matrix.strip || 'strip' }} chdman
           ls -al chdman
+      - name: Test binary
+        run: |
+          set -x
+          file chdman
+          readelf -d chdman | grep NEEDED
+          if readelf -d dolphin-tool | grep NEEDED | grep -q 'libSDL2'; then exit 1; fi
       - name: Rename binary
         run: |
           dir="artifacts/packages/chdman-linux-${{ matrix.nodejs_arch }}"
