@@ -102,11 +102,15 @@ jobs:
           set -x
 
           # Only build chdman
+          gawk --include inplace '!/^[[:space:]]*scripts\/.*cpu/' makefile
           gawk --include inplace '!/^[[:space:]]*scripts\/.*emu/' makefile
+          gawk --include inplace '!/^[[:space:]]*scripts\/.*formats/' makefile
           gawk --include inplace '!/^[[:space:]]*scripts\/.*frontend/' makefile
+          gawk --include inplace '!/^[[:space:]]*scripts\/.*machine/' makefile
           gawk --include inplace '!/^[[:space:]]*scripts\/.*main/' makefile
           gawk --include inplace '!/^[[:space:]]*scripts\/.*netlist/' makefile
           gawk --include inplace '!/^[[:space:]]*scripts\/.*osd/' makefile
+          gawk --include inplace '!/^[[:space:]]*scripts\/.*sound/' makefile
           gawk --include inplace '!/^[[:space:]]*scripts\/.*video/' makefile
           gawk --include inplace '/^-- chdman/{flag=1; next} /^-- /{flag=0} flag' scripts/src/tools.lua
 
