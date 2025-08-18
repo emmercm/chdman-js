@@ -76,10 +76,7 @@ jobs:
 
           # https://docs.mamedev.org/initialsetup/compilingmame.html#debian-and-ubuntu-including-raspberry-pi-and-odroid-devices
           sudo apt-get update
-          sudo apt-get install --yes git build-essential python3 libsdl2-dev libsdl2-ttf-dev libfontconfig-dev libpulse-dev qtbase5-dev qtbase5-dev-tools qtchooser qt5-qmake \
-
-          # Force static linking
-          sudo rm "$(pkg-config --variable=libdir sdl2)"/libSDL2*.so*
+          sudo apt-get install --yes git build-essential python3 libsdl2-dev libsdl2-ttf-dev libfontconfig-dev libpulse-dev qtbase5-dev qtbase5-dev-tools qtchooser qt5-qmake
 
           sudo sed -ie "s/deb /deb [arch=$(dpkg --print-architecture)] /g" /etc/apt/sources.list
           sudo dpkg --add-architecture amd64
@@ -92,13 +89,21 @@ jobs:
           echo "deb [arch=armhf,arm64,ppc64el,riscv64,s390x] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release --codename | awk '{print $2}')-updates main multiverse restricted universe" | sudo tee -a /etc/apt/sources.list
           sudo apt-get update || true
           sudo apt-get install --yes crossbuild-essential-${{ matrix.apt_architecture }} libsdl2-dev:${{ matrix.apt_architecture }}
+
+          # Force static linking
+          sudo apt-get install --yes libwayland-dev libwayland-dev:${{ matrix.apt_architecture }}
+          sudo rm "$(pkg-config --variable=libdir sdl2)"/../*/libSDL2-2.0*.so*
       - name: Build
         env:
           OVERRIDE_CC: ${{ matrix.cc || 'gcc' }}
           OVERRIDE_CXX: ${{ matrix.cxx || 'g++' }}
           ARCHOPTS: -U_FORTIFY_SOURCE ${{ matrix.archopts }}
           TARGETOS: linux
-        run: make "-j$(nproc)" -r
+        run: |
+          make \
+            "-j$(nproc)" \
+            -r \
+            LDFLAGS="$(pkg-config --static --libs sdl2)"
       - name: Strip binary
         run: |
           sudo apt-get install --yes binutils binutils-i686-gnu binutils-arm-linux-gnueabihf binutils-aarch64-linux-gnu
