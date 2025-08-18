@@ -76,7 +76,7 @@ jobs:
           sudo apt-get install --yes git build-essential python3 libsdl2-dev libsdl2-ttf-dev libfontconfig-dev libpulse-dev qtbase5-dev qtbase5-dev-tools qtchooser qt5-qmake \
 
           # Force static linking
-          rm "$(pkg-config --variable=libdir sdl2)"/libSDL2*.so*
+          sudo rm "$(pkg-config --variable=libdir sdl2)"/libSDL2*.so*
 
           sudo sed -ie "s/deb /deb [arch=$(dpkg --print-architecture)] /g" /etc/apt/sources.list
           sudo dpkg --add-architecture amd64
