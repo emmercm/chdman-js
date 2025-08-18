@@ -100,10 +100,13 @@ jobs:
           ARCHOPTS: -U_FORTIFY_SOURCE ${{ matrix.archopts }}
           TARGETOS: linux
         run: |
+          # Only build chdman
+          gawk --include inplace '/^-- chdman/{flag=1; next} /^-- /{flag=0} flag' scripts/src/tools.lua
+
           make \
             "-j$(nproc)" \
             -r \
-            LDFLAGS="$(pkg-config --static --libs sdl2)"
+            LDFLAGS="$(pkg-config --static --libs sdl2)" || if [[ ! -f chdman ]]; then exit 1; fi
       - name: Strip binary
         run: |
           sudo apt-get install --yes binutils binutils-i686-gnu binutils-arm-linux-gnueabihf binutils-aarch64-linux-gnu
