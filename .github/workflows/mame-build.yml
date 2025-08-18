@@ -5,10 +5,11 @@
 name: MAME Build
 
 on:
+  pull_request: # TODO(cemmer): DEBUG!
   workflow_dispatch:
     inputs:
       mame_ref:
-        description: 'MAME GitHub branch, tag, or SHA (e.g. "mame0274")'
+        description: 'MAME GitHub branch, tag, or SHA (e.g. "mame0279")'
         required: true
         type: string
       auto-merge:
@@ -25,7 +26,7 @@ permissions:
   contents: write
 
 env:
-  MAME_REF: ${{ inputs.mame_ref || 'mame0274' }}
+  MAME_REF: ${{ inputs.mame_ref || 'mame0279' }}
   # `make` options
   EMULATOR: 0
   TOOLS: 1
@@ -73,6 +74,9 @@ jobs:
           # https://docs.mamedev.org/initialsetup/compilingmame.html#debian-and-ubuntu-including-raspberry-pi-and-odroid-devices
           sudo apt-get update
           sudo apt-get install --yes git build-essential python3 libsdl2-dev libsdl2-ttf-dev libfontconfig-dev libpulse-dev qtbase5-dev qtbase5-dev-tools qtchooser qt5-qmake \
+
+          # Force static linking
+          rm "$(pkg-config --variable=libdir sdl2)"/libSDL2*.so*
 
           sudo sed -ie "s/deb /deb [arch=$(dpkg --print-architecture)] /g" /etc/apt/sources.list
           sudo dpkg --add-architecture amd64
