@@ -36,6 +36,7 @@ env:
   DEBUG: 0
   SYMBOLS: 0
   OPTIMIZE: s
+  USE_WAYLAND: 0
 
 jobs:
   build-linux:
