@@ -120,7 +120,7 @@ jobs:
   build-macos:
     strategy:
       matrix:
-        os: [macos-13, macos-15]
+        os: [macos-15-intel, macos-15]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -197,15 +197,10 @@ jobs:
           install: curl git make
           pacboy: clang:p gcc:p libc++:p lld:p python:p llvm:p ${{ matrix.pacboy }}
       - run: |
-          # https://docs.mamedev.org/initialsetup/compilingmame.html#using-a-standard-msys2-installation
-          if [[ "${{ matrix.msystem }}" == "mingw32" ]]; then
-            echo "MINGW64=" >> "${GITHUB_ENV}"
-            echo "MINGW32=/mingw32" >> "${GITHUB_ENV}"
-          else
-            echo "MINGW64=/mingw64" >> "${GITHUB_ENV}"
-            echo "MINGW32=" >> "${GITHUB_ENV}"
-          fi
+          set -x
           echo $PATH
+          python --version
+          python3 --version
       - name: Build
         env:
           OVERRIDE_AR: "llvm-ar"
