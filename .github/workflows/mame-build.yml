@@ -205,6 +205,7 @@ jobs:
             echo "MINGW64=/mingw64" >> "${GITHUB_ENV}"
             echo "MINGW32=" >> "${GITHUB_ENV}"
           fi
+          echo $PATH
       - name: Build
         env:
           OVERRIDE_AR: "llvm-ar"
