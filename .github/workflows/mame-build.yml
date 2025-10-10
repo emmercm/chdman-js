@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
     inputs:
       mame_ref:
-        description: 'MAME GitHub branch, tag, or SHA (e.g. "mame0274")'
+        description: 'MAME GitHub branch, tag, or SHA (e.g. "mame0281")'
         required: true
         type: string
       auto-merge:
@@ -26,7 +26,7 @@ permissions:
   contents: write
 
 env:
-  MAME_REF: ${{ inputs.mame_ref || 'mame0274' }}
+  MAME_REF: ${{ inputs.mame_ref || 'mame0281' }}
   # `make` options
   EMULATOR: 0
   TOOLS: 1
@@ -119,6 +119,7 @@ jobs:
   # https://github.com/mamedev/mame/blob/4505d5459fed086d35f08d7572cb55cd661cd707/.github/workflows/ci-macos.yml
   build-macos:
     strategy:
+      fail-fast: false
       matrix:
         os: [macos-15-intel, macos-15]
     runs-on: ${{ matrix.os }}
@@ -172,6 +173,7 @@ jobs:
   # https://github.com/mamedev/mame/blob/4505d5459fed086d35f08d7572cb55cd661cd707/.github/workflows/ci-windows.yml
   build-windows:
     strategy:
+      fail-fast: false
       matrix:
         msystem: [mingw64, mingw32]
         include:
