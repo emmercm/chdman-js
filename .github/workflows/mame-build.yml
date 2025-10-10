@@ -182,8 +182,9 @@ jobs:
             nodejs_arch: x64
           - msystem: mingw32
             nodejs_arch: ia32
-          # - msystem: clangarm64
-          #   nodejs_arch: arm64
+          - msystem: clangarm64
+            nodejs_arch: arm64
+            pacboy: mingw-w64-clang-aarch64-gcc-compat:p
     steps:
       - uses: actions/checkout@v4
         with:
@@ -193,7 +194,7 @@ jobs:
         with:
           msystem: ${{ matrix.msystem }}
           install: curl git make
-          pacboy: clang:p gcc:p libc++:p lld:p python:p llvm:p
+          pacboy: clang:p gcc:p libc++:p lld:p python:p llvm:p ${{ matrix.pacboy }}
       - run: |
           # https://docs.mamedev.org/initialsetup/compilingmame.html#using-a-standard-msys2-installation
           if [[ "${{ matrix.msystem }}" == "mingw64" ]]; then
