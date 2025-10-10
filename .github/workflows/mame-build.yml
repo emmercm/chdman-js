@@ -183,6 +183,7 @@ jobs:
           - os: windows-latest
             msystem: mingw32
             nodejs_arch: ia32
+          # Windows ARM64 builds started being published with MAME v0.281 (Sep 2025)
           - os: windows-11-arm
             msystem: clangarm64
             nodejs_arch: arm64
@@ -234,6 +235,7 @@ jobs:
           if-no-files-found: error
 
   git-update:
+    if: ${{ startsWith(github.event_name, 'pull_request') }}  # debug protection
     needs:
       - build-linux
       - build-macos
