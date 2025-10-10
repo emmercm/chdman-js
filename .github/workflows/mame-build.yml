@@ -26,7 +26,7 @@ permissions:
   contents: write
 
 env:
-  CHDMANJS_REF: ${{ github.ref }}
+  CHDMANJS_REF: ${{ github.head_ref || github.ref }}
 
   MAME_REF: ${{ inputs.mame_ref || 'mame0281' }}
   # `make` options
