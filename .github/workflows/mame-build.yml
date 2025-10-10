@@ -185,7 +185,7 @@ jobs:
             nodejs_arch: ia32
           - msystem: clangarm64
             nodejs_arch: arm64
-            pacboy: mingw-w64-llvm:p
+            pacboy: gcc-compat:p
     steps:
       - uses: actions/checkout@v4
         with:
