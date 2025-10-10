@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       mame_ref:
-        description: 'MAME GitHub branch, tag, or SHA (e.g. "mame0274")'
+        description: 'MAME GitHub branch, tag, or SHA (e.g. "mame0281")'
         required: true
         type: string
       auto-merge:
@@ -25,7 +25,9 @@ permissions:
   contents: write
 
 env:
-  MAME_REF: ${{ inputs.mame_ref || 'mame0274' }}
+  CHDMANJS_REF: ${{ github.head_ref || github.ref }}
+
+  MAME_REF: ${{ inputs.mame_ref || 'mame0281' }}
   # `make` options
   EMULATOR: 0
   TOOLS: 1
@@ -118,8 +120,9 @@ jobs:
   # https://github.com/mamedev/mame/blob/4505d5459fed086d35f08d7572cb55cd661cd707/.github/workflows/ci-macos.yml
   build-macos:
     strategy:
+      fail-fast: false
       matrix:
-        os: [macos-13, macos-15]
+        os: [macos-15-intel, macos-15]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -170,20 +173,26 @@ jobs:
 
   # https://github.com/mamedev/mame/blob/4505d5459fed086d35f08d7572cb55cd661cd707/.github/workflows/ci-windows.yml
   build-windows:
-    runs-on: windows-latest
-    defaults:
-      run:
-        shell: msys2 {0}
     strategy:
+      fail-fast: false
       matrix:
         msystem: [mingw64, mingw32]
         include:
-          - msystem: mingw64
+          - os: windows-latest
+            msystem: mingw64
             nodejs_arch: x64
-          - msystem: mingw32
+          - os: windows-latest
+            msystem: mingw32
             nodejs_arch: ia32
-          # - msystem: clangarm64
-          #   nodejs_arch: arm64
+          # Windows ARM64 builds started being published with MAME v0.281 (Sep 2025)
+          - os: windows-11-arm
+            msystem: clangarm64
+            nodejs_arch: arm64
+            pacboy: gcc-compat:p
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: msys2 {0}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -193,19 +202,12 @@ jobs:
         with:
           msystem: ${{ matrix.msystem }}
           install: curl git make
-          pacboy: clang:p gcc:p libc++:p lld:p python:p llvm:p
+          pacboy: clang:p gcc:p libc++:p lld:p python:p llvm:p ${{ matrix.pacboy }}
       - run: |
-          # https://docs.mamedev.org/initialsetup/compilingmame.html#using-a-standard-msys2-installation
-          if [[ "${{ matrix.msystem }}" == "mingw64" ]]; then
-            echo "MINGW64=/mingw64" >> "${GITHUB_ENV}"
-            echo "MINGW32=" >> "${GITHUB_ENV}"
-          elif [[ "${{ matrix.msystem }}" == "mingw32" ]]; then
-            echo "MINGW64=" >> "${GITHUB_ENV}"
-            echo "MINGW32=/mingw32" >> "${GITHUB_ENV}"
-          else
-            echo "MINGW64=" >> "${GITHUB_ENV}"
-            echo "MINGW32=" >> "${GITHUB_ENV}"
-          fi
+          set -x
+          echo $PATH
+          python --version
+          python3 --version
       - name: Build
         env:
           OVERRIDE_AR: "llvm-ar"
@@ -234,6 +236,7 @@ jobs:
           if-no-files-found: error
 
   git-update:
+    if: ${{ startsWith(github.event_name, 'pull_request') }}  # debug protection
     needs:
       - build-linux
       - build-macos
@@ -241,6 +244,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.CHDMANJS_REF }}
       - name: Delete old macoS .dylibs
         run: |
           rm packages/*-darwin-*/*.dylib

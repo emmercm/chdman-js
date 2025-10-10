@@ -1,8 +1,8 @@
 {
-  "name": "@emmercm/chdman-darwin-arm64",
-  "version": "0.281.1",
+  "name": "@emmercm/chdman-win32-arm64",
+  "version": "0.281.0",
   "os": [
-    "darwin"
+    "win32"
   ],
   "cpu": [
     "arm64"
@@ -18,7 +18,7 @@
     "provenance": true
   },
   "scripts": {
-    "build": "tsc --build --verbose && cp chdman *.dylib dist/",
+    "build": "tsc --build --verbose && cp chdman* dist/",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "prepack": "npm run build && cp -f ../../LICENSE ../../README.md ./",
