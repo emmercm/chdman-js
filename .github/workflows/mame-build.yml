@@ -26,6 +26,8 @@ permissions:
   contents: write
 
 env:
+  CHDMANJS_REF: ${{ github.ref }}
+
   MAME_REF: ${{ inputs.mame_ref || 'mame0281' }}
   # `make` options
   EMULATOR: 0
@@ -243,6 +245,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.CHDMANJS_REF }}
       - name: Delete old macoS .dylibs
         run: |
           rm packages/*-darwin-*/*.dylib
