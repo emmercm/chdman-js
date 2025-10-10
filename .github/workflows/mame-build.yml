@@ -5,7 +5,6 @@
 name: MAME Build
 
 on:
-  pull_request:
   workflow_dispatch:
     inputs:
       mame_ref:
@@ -237,7 +236,7 @@ jobs:
           if-no-files-found: error
 
   git-update:
-    if: ${{ startsWith(github.event_name, 'pull_request') }}
+    if: ${{ startsWith(github.event_name, 'pull_request') }}  # debug protection
     needs:
       - build-linux
       - build-macos
