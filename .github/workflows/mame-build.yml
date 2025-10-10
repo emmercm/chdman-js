@@ -171,21 +171,24 @@ jobs:
 
   # https://github.com/mamedev/mame/blob/4505d5459fed086d35f08d7572cb55cd661cd707/.github/workflows/ci-windows.yml
   build-windows:
-    runs-on: windows-latest
-    defaults:
-      run:
-        shell: msys2 {0}
     strategy:
       matrix:
         msystem: [mingw64, mingw32]
         include:
-          - msystem: mingw64
+          - os: windows-latest
+            msystem: mingw64
             nodejs_arch: x64
-          - msystem: mingw32
+          - os: windows-latest
+            msystem: mingw32
             nodejs_arch: ia32
-          - msystem: clangarm64
+          - os: windows-11-arm
+            msystem: clangarm64
             nodejs_arch: arm64
             pacboy: gcc-compat:p
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: msys2 {0}
     steps:
       - uses: actions/checkout@v4
         with:
