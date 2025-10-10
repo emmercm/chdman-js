@@ -198,14 +198,11 @@ jobs:
           pacboy: clang:p gcc:p libc++:p lld:p python:p llvm:p ${{ matrix.pacboy }}
       - run: |
           # https://docs.mamedev.org/initialsetup/compilingmame.html#using-a-standard-msys2-installation
-          if [[ "${{ matrix.msystem }}" == "mingw64" ]]; then
-            echo "MINGW64=/mingw64" >> "${GITHUB_ENV}"
-            echo "MINGW32=" >> "${GITHUB_ENV}"
-          elif [[ "${{ matrix.msystem }}" == "mingw32" ]]; then
+          if [[ "${{ matrix.msystem }}" == "mingw32" ]]; then
             echo "MINGW64=" >> "${GITHUB_ENV}"
             echo "MINGW32=/mingw32" >> "${GITHUB_ENV}"
           else
-            echo "MINGW64=" >> "${GITHUB_ENV}"
+            echo "MINGW64=/mingw64" >> "${GITHUB_ENV}"
             echo "MINGW32=" >> "${GITHUB_ENV}"
           fi
       - name: Build
