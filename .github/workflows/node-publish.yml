@@ -1,6 +1,3 @@
-# https://docs.github.com/en/actions/publishing-packages/publishing-nodejs-packages
-# Requires repo secret: NPM_TOKEN ("automation" access token)
-
 name: Node.js Publish
 
 on:
@@ -15,7 +12,8 @@ jobs:
     permissions:
       # actions/checkout@v4
       contents: read
-      # `npm publish --provenance`
+      # https://docs.npmjs.com/trusted-publishers#github-actions-configuration
+      # https://docs.npmjs.com/generating-provenance-statements#publishing-packages-with-provenance-via-github-actions
       id-token: write
       # thollander/actions-comment-pull-request@v2
       pull-requests: write
@@ -29,14 +27,11 @@ jobs:
         name: npm publish
         run: |
           set -x
-          npm whoami
           lerna publish from-package --yes
           {
             echo "PACKAGE_NAME=$(jq --raw-output '.name' packages/chdman/package.json)"
             echo "PACKAGE_VERSION=$(jq --raw-output '.version' packages/chdman/package.json)"
           } >> "${GITHUB_OUTPUT}"
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       # Comment back on the PR that caused this push
       - id: pr-finder
