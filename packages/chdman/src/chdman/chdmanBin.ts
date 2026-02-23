@@ -1,7 +1,11 @@
 import which from 'which';
 import util from 'node:util';
 import fs from 'node:fs';
-import * as child_process from 'node:child_process';
+import child_process from 'node:child_process';
+import os from 'node:os';
+import path from 'node:path';
+import stream from 'node:stream';
+import crypto from 'node:crypto';
 
 export interface ChdmanRunOptions {
   binaryPreference?: ChdmanBinaryPreference
@@ -40,6 +44,11 @@ export default class ChdmanBin {
   }
 
   private static async getBinPathBundled(): Promise<string | undefined> {
+    const bunPath = await this.getBinPathBundledBun();
+    if (bunPath !== undefined) {
+      return bunPath;
+    }
+
     try {
       const chdman = await import(`@emmercm/chdman-${process.platform}-${process.arch}`);
       const prebuilt = chdman.default;
@@ -47,6 +56,61 @@ export default class ChdmanBin {
         await util.promisify(fs.stat)(prebuilt);
         return prebuilt;
       } catch { /* ignored */ }
+    } catch { /* ignored */ }
+
+    return undefined;
+  }
+
+  /**
+   * Look for chdman binaries bundled with:
+   * `bun build --compile --asset-naming="[name].[ext]" chdman *.dylib`
+   */
+  private static async getBinPathBundledBun(): Promise<string | undefined> {
+    try {
+      const { embeddedFiles } = await import('bun');
+
+      // Find all files that might be chdman-related
+      const chdmanBlob = embeddedFiles.find((blob) => {
+        // @ts-expect-error https://github.com/oven-sh/bun/issues/20700
+        const blobName: string = blob.name;
+        return blobName.toLowerCase().startsWith('chdman');
+      });
+
+      if (chdmanBlob !== undefined) {
+        // Create the temporary directory
+        const hash = crypto.createHash('md5');
+        await chdmanBlob.stream().pipeTo(new WritableStream({
+          write(chunk): void {
+            hash.update(chunk);
+          },
+        }));
+        const temporaryDirectory = path.join(os.tmpdir(), `chdman-${hash.digest('hex').slice(0, 7)}`);
+        if (!(await util.promisify(fs.exists)(temporaryDirectory))) {
+          await util.promisify(fs.mkdir)(temporaryDirectory);
+        }
+
+        // Find additional files that might be necessary
+        const dylibBlobs = embeddedFiles.filter((blob) => {
+          // @ts-expect-error https://github.com/oven-sh/bun/issues/20700
+          const blobName: string = blob.name;
+          return blobName.toLowerCase().endsWith('.dylib');
+        });
+
+        // Extract all files if necessary
+        const temporaryBlobs = await Promise.all([chdmanBlob, ...dylibBlobs].map(async (blob) => {
+          // @ts-expect-error https://github.com/oven-sh/bun/issues/20700
+          const blobName: string = blob.name;
+          const temporaryBlob = path.join(temporaryDirectory, blobName).replace(/\.+$/, '');
+          if (await util.promisify(fs.exists)(temporaryBlob)) {
+            return temporaryBlob;
+          }
+          const writableStream = stream.Writable.toWeb(fs.createWriteStream(temporaryBlob));
+          await blob.stream().pipeTo(writableStream);
+          await util.promisify(fs.chmod)(temporaryBlob, 0o755); // chmod +x
+          return temporaryBlob;
+        }));
+        return temporaryBlobs.find((temporaryBlob) => path.basename(temporaryBlob).startsWith('chdman'));
+      }
     } catch { /* ignored */ }
 
     return undefined;
