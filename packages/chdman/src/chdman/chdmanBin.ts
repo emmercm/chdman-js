@@ -99,8 +99,8 @@ export default class ChdmanBin {
         // Extract all files if necessary
         const temporaryBlobs = await Promise.all([chdmanBlob, ...dylibBlobs].map(async (blob) => {
           // @ts-expect-error https://github.com/oven-sh/bun/issues/20700
-          const blobName: string = blob.name;
-          const temporaryBlob = path.join(temporaryDirectory, blobName).replace(/\.+$/, '');
+          const blobName: string = blob.name.replace(/-[\da-z]{8}\./, '.').replace(/\.+$/, '');
+          const temporaryBlob = path.join(temporaryDirectory, blobName);
           if (await util.promisify(fs.exists)(temporaryBlob)) {
             return temporaryBlob;
           }
