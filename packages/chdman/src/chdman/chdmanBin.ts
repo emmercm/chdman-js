@@ -84,10 +84,7 @@ export default class ChdmanBin {
             hash.update(chunk);
           },
         }));
-        const temporaryDirectory = path.join(os.tmpdir(), `chdman-${hash.digest('hex').slice(0, 7)}`);
-        if (!(await util.promisify(fs.exists)(temporaryDirectory))) {
-          await util.promisify(fs.mkdir)(temporaryDirectory);
-        }
+        const temporaryDirectory = await this.getTemporaryDirectory(`chdman-${hash.digest('hex').slice(0, 7)}`);
 
         // Find additional files that might be necessary
         const dylibBlobs = embeddedFiles.filter((blob) => {
@@ -114,6 +111,29 @@ export default class ChdmanBin {
     } catch { /* ignored */ }
 
     return undefined;
+  }
+
+  private static async getTemporaryDirectory(temporaryDirectoryBasename: string): Promise<string> {
+    const candidateDirectories = [
+      path.join(os.tmpdir(), temporaryDirectoryBasename),
+      path.join(process.cwd(), '.chdman', temporaryDirectoryBasename),
+      path.join(os.homedir(), '.chdman', temporaryDirectoryBasename),
+    ];
+    /* eslint-disable no-await-in-loop */
+    for (const candidateDirectory of candidateDirectories) {
+      try {
+        if (!(await util.promisify(fs.exists)(candidateDirectory))) {
+          await util.promisify(fs.mkdir)(candidateDirectory, { recursive: true });
+        }
+        const temporaryFile = path.join(candidateDirectory, temporaryDirectoryBasename);
+        await util.promisify(fs.writeFile)(temporaryFile, temporaryFile);
+        await util.promisify(fs.unlink)(temporaryFile);
+        return candidateDirectory;
+      } catch {
+        /* ignored */
+      }
+    }
+    throw new Error("couldn't find a suitable temporary directory");
   }
 
   private static async getBinPathExisting(): Promise<string | undefined> {
