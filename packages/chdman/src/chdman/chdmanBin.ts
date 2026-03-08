@@ -6,6 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import stream from 'node:stream';
 import crypto from 'node:crypto';
+import { Mutex } from 'async-mutex';
 
 export interface ChdmanRunOptions {
   binaryPreference?: ChdmanBinaryPreference
@@ -23,6 +24,8 @@ export enum ChdmanBinaryPreference {
 export default class ChdmanBin {
   private static CHDMAN_BIN: string | undefined;
 
+  private static readonly CHDMAN_BIN_MUTEX = new Mutex();
+
   private static async getBinPath(
     binaryPreference?: ChdmanBinaryPreference,
   ): Promise<string | undefined> {
@@ -30,17 +33,23 @@ export default class ChdmanBin {
       return this.CHDMAN_BIN;
     }
 
-    if ((binaryPreference ?? ChdmanBinaryPreference.PREFER_BUNDLED_BINARY)
-      === ChdmanBinaryPreference.PREFER_BUNDLED_BINARY
-    ) {
-      const pathBundled = await this.getBinPathBundled();
-      this.CHDMAN_BIN = pathBundled ?? (await this.getBinPathExisting());
-    } else {
-      const pathExisting = await this.getBinPathExisting();
-      this.CHDMAN_BIN = pathExisting ?? (await this.getBinPathBundled());
-    }
+    return this.CHDMAN_BIN_MUTEX.runExclusive(async () => {
+      if (this.CHDMAN_BIN) {
+        return this.CHDMAN_BIN;
+      }
 
-    return this.CHDMAN_BIN;
+      if ((binaryPreference ?? ChdmanBinaryPreference.PREFER_BUNDLED_BINARY)
+      === ChdmanBinaryPreference.PREFER_BUNDLED_BINARY
+      ) {
+        const pathBundled = await this.getBinPathBundled();
+        this.CHDMAN_BIN = pathBundled ?? (await this.getBinPathExisting());
+      } else {
+        const pathExisting = await this.getBinPathExisting();
+        this.CHDMAN_BIN = pathExisting ?? (await this.getBinPathBundled());
+      }
+
+      return this.CHDMAN_BIN;
+    });
   }
 
   private static async getBinPathBundled(): Promise<string | undefined> {
@@ -98,8 +107,11 @@ export default class ChdmanBin {
           // @ts-expect-error https://github.com/oven-sh/bun/issues/20700
           const blobName: string = blob.name.replace(/-[\da-z]{8}\./, '.').replace(/\.+$/, '');
           const temporaryBlob = path.join(temporaryDirectory, blobName);
-          if (await util.promisify(fs.exists)(temporaryBlob)) {
+          try {
+            await util.promisify(fs.stat)(temporaryBlob);
             return temporaryBlob;
+          } catch {
+            /* ignored */
           }
           const writableStream = stream.Writable.toWeb(fs.createWriteStream(temporaryBlob));
           await blob.stream().pipeTo(writableStream);
@@ -122,7 +134,9 @@ export default class ChdmanBin {
     /* eslint-disable no-await-in-loop */
     for (const candidateDirectory of candidateDirectories) {
       try {
-        if (!(await util.promisify(fs.exists)(candidateDirectory))) {
+        try {
+          await util.promisify(fs.stat)(candidateDirectory);
+        } catch {
           await util.promisify(fs.mkdir)(candidateDirectory, { recursive: true });
         }
         const temporaryFile = path.join(candidateDirectory, temporaryDirectoryBasename);
