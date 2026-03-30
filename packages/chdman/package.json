@@ -64,7 +64,6 @@
     "@emmercm/chdman-linux-ia32": "^0.286.2",
     "@emmercm/chdman-linux-x64": "^0.286.2",
     "@emmercm/chdman-win32-arm64": "^0.286.2",
-    "@emmercm/chdman-win32-ia32": "^0.286.2",
     "@emmercm/chdman-win32-x64": "^0.286.2"
   },
   "devDependencies": {

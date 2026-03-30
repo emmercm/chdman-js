@@ -112,3 +112,4 @@ packages/*/test/fixtures/*/build/
 packages/*/junit.xml
 packages/*/LICENSE
 packages/*/README.md
+!packages/chdman-win32-ia32/README.md

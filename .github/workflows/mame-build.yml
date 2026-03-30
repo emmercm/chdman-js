@@ -176,14 +176,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        msystem: [mingw64, mingw32]
         include:
           - os: windows-latest
             msystem: mingw64
             nodejs_arch: x64
-          - os: windows-latest
-            msystem: mingw32
-            nodejs_arch: ia32
           # Windows ARM64 builds started being published with MAME v0.281 (Sep 2025)
           - os: windows-11-arm
             msystem: clangarm64
