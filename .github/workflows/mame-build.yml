@@ -28,7 +28,7 @@ permissions:
 env:
   CHDMANJS_REF: ${{ github.head_ref || github.ref }}
 
-  MAME_REF: ${{ inputs.mame_ref || 'mame0281' }}
+  MAME_REF: ${{ inputs.mame_ref || 'mame0287' }}
   # `make` options
   EMULATOR: 0
   TOOLS: 1
