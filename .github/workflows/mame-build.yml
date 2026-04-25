@@ -163,7 +163,7 @@ jobs:
             cp "${file}" ./
             install_name_tool -change "${file}" "@executable_path/$(basename "${file}")" chdman
           done
-          brew uninstall --ignore-dependencies sdl3
+          brew uninstall --ignore-dependencies sdl2 sdl3
       - name: Test binary
         run: |
           set -x
