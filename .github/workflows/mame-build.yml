@@ -40,71 +40,89 @@ env:
 
 jobs:
   build-linux:
-    # gcc-cross/*-linux-gnu/13 seems to have issues as of mame0274
-    # https://github.com/emmercm/chdman-js/actions/runs/13294147953/job/37121892032
-    runs-on: ubuntu-22.04
+    name: build-linux ${{ matrix.nodejs_arch }}
     strategy:
       fail-fast: false
       matrix:
         include:
-          - apt_architecture: amd64
-            nodejs_arch: x64
-          - apt_architecture: i386
-            cc: i686-linux-gnu-gcc-11
-            cxx: i686-linux-gnu-g++-11
-            strip: i686-gnu-strip
+          - os: ubuntu-latest
+            docker_image: i386/alpine:latest
+            docker_arch: linux/386
             nodejs_arch: ia32
-          - apt_architecture: armhf
-            cc: arm-linux-gnueabihf-gcc-11
-            cxx: arm-linux-gnueabihf-g++-11
-            archopts: -mfpu=neon
-            strip: arm-linux-gnueabihf-strip
+          - os: ubuntu-latest
+            docker_image: alpine:latest
+            docker_arch: linux/amd64
+            nodejs_arch: x64
+          - os: ubuntu-latest
+            docker_image: alpine:latest
+            docker_arch: linux/arm/v7
             nodejs_arch: arm
-          - apt_architecture: arm64
-            cc: aarch64-linux-gnu-gcc-11
-            cxx: aarch64-linux-gnu-g++-11
-            strip: aarch64-linux-gnu-strip
+          - os: ubuntu-latest
+            docker_image: alpine:latest
+            docker_arch: linux/arm64/v8
             nodejs_arch: arm64
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
         with:
           repository: mamedev/mame
           ref: ${{ env.MAME_REF }}
-      - name: Install dependencies
-        run: |
-          # https://docs.mamedev.org/initialsetup/compilingmame.html#debian-and-ubuntu-including-raspberry-pi-and-odroid-devices
-          sudo apt-get update
-          sudo apt-get install --yes git build-essential python3 libsdl2-dev libsdl2-ttf-dev libfontconfig-dev libpulse-dev qtbase5-dev qtbase5-dev-tools qtchooser qt5-qmake \
-
-          sudo sed -ie "s/deb /deb [arch=$(dpkg --print-architecture)] /g" /etc/apt/sources.list
-          sudo dpkg --add-architecture amd64
-          sudo dpkg --add-architecture i386
-          echo "deb [arch=amd64,i386] http://archive.ubuntu.com/ubuntu/ $(lsb_release --codename | awk '{print $2}') main multiverse restricted universe" | sudo tee -a /etc/apt/sources.list
-          echo "deb [arch=amd64,i386] http://archive.ubuntu.com/ubuntu/ $(lsb_release --codename | awk '{print $2}')-updates main multiverse restricted universe" | sudo tee -a /etc/apt/sources.list
-          sudo dpkg --add-architecture armhf
-          sudo dpkg --add-architecture arm64
-          echo "deb [arch=armhf,arm64,ppc64el,riscv64,s390x] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release --codename | awk '{print $2}') main multiverse restricted universe" | sudo tee -a /etc/apt/sources.list
-          echo "deb [arch=armhf,arm64,ppc64el,riscv64,s390x] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release --codename | awk '{print $2}')-updates main multiverse restricted universe" | sudo tee -a /etc/apt/sources.list
-          sudo apt-get update || true
-          sudo apt-get install --yes crossbuild-essential-${{ matrix.apt_architecture }} libsdl2-dev:${{ matrix.apt_architecture }}
+      - uses: docker/setup-qemu-action@v3
       - name: Build
-        env:
-          OVERRIDE_CC: ${{ matrix.cc || 'gcc' }}
-          OVERRIDE_CXX: ${{ matrix.cxx || 'g++' }}
-          ARCHOPTS: -U_FORTIFY_SOURCE ${{ matrix.archopts }}
-          TARGETOS: linux
-        run: make "-j$(nproc)" -r
+        uses: addnab/docker-run-action@v3
+        with:
+          image: ${{ matrix.docker_image }}
+          shell: sh
+          options: |
+            --platform ${{ matrix.docker_arch }}
+            --volume ${{ github.workspace }}:/build
+            --workdir /build
+          run: |
+            set -euxo pipefail
+            apk add --no-cache build-base python3 sdl2-dev sdl2-static
+            make VERBOSE=1 -j$(nproc) -r \
+              TARGETOS=linux \
+              ARCHOPTS='-U_FORTIFY_SOURCE -ffunction-sections -fdata-sections -flto' \
+              LDOPTS='-static -Wl,--gc-sections -flto'
       - name: Test binary
-        run: |
-          set -x
-          file chdman
-          readelf -d chdman | grep NEEDED
+        uses: addnab/docker-run-action@v3
+        with:
+          image: ${{ matrix.docker_image }}
+          shell: sh
+          options: |
+            --platform ${{ matrix.docker_arch }}
+            --volume ${{ github.workspace }}:/build
+            --workdir /build
+          run: |
+            set -euxo pipefail
+            apk add --no-cache file binutils
+            ./chdman --help || true
+            file chdman
+            readelf -d chdman || true
+            if readelf -d chdman | grep -q NEEDED; then
+              echo "ERROR: binary has dynamic dependencies, expected fully static"
+              readelf -d chdman | grep NEEDED
+              exit 1
+            fi
+            if ! file chdman | grep -qE 'statically linked|static-pie linked'; then
+              echo "ERROR: 'file' does not report the binary as statically linked"
+              exit 1
+            fi
       - name: Strip binary
-        run: |
-          sudo apt-get install --yes binutils binutils-i686-gnu binutils-arm-linux-gnueabihf binutils-aarch64-linux-gnu
-          ls -al chdman
-          ${{ matrix.strip || 'strip' }} chdman
-          ls -al chdman
+        uses: addnab/docker-run-action@v3
+        with:
+          image: ${{ matrix.docker_image }}
+          shell: sh
+          options: |
+            --platform ${{ matrix.docker_arch }}
+            --volume ${{ github.workspace }}:/build
+            --workdir /build
+          run: |
+            set -euxo pipefail
+            apk add --no-cache binutils
+            ls -al chdman
+            strip chdman
+            ls -al chdman
       - name: Rename binary
         run: |
           dir="artifacts/packages/chdman-linux-${{ matrix.nodejs_arch }}"
@@ -113,7 +131,7 @@ jobs:
           ls -al "${dir}/"
       - uses: actions/upload-artifact@v4
         with:
-          name: ${{ runner.os }}-${{ matrix.apt_architecture }}-${{ github.sha }}
+          name: ${{ runner.os }}-${{ matrix.nodejs_arch }}-${{ github.sha }}
           path: artifacts/**/chdman
           if-no-files-found: error
 
@@ -134,6 +152,7 @@ jobs:
       - name: Build
         env:
           USE_LIBSDL: 1
+          ARCHOPTS: "-ffunction-sections -fdata-sections -flto -Wl,-dead_strip"
         run: make "-j$(sysctl -n hw.physicalcpu)" -r
       - name: Make portable
         run: |
@@ -209,7 +228,7 @@ jobs:
           OVERRIDE_AR: "llvm-ar"
           OVERRIDE_CC: clang
           OVERRIDE_CXX: clang++
-          ARCHOPTS: "-fuse-ld=lld"
+          ARCHOPTS: "-fuse-ld=lld -ffunction-sections -fdata-sections -flto -Wl,--gc-sections"
         run: make VERBOSE=1 -j$(nproc) -r
       - name: Test binary
         run: |
