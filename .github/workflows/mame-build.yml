@@ -118,7 +118,10 @@ jobs:
             # since we fake __GLIBC__, ALSA enters the glibc branch and tries to redefine structs that musl's
             # <sys/types.h> already provides. Setting _POSIX_C_SOURCE=200809L makes the inner guard false and
             # ALSA uses musl's existing definitions. This is needed because portaudio (compiled bundled, since
-            # Alpine ships no libportaudio.a) #includes <alsa/asoundlib.h>.
+            # Alpine ships no libportaudio.a) #includes <alsa/asoundlib.h>. _GNU_SOURCE is then layered on top
+            # to re-expose extensions (alloca, full struct timespec under all include paths) that strict POSIX
+            # mode would hide; ALSA's struct-redef guard only checks for _POSIX_C_SOURCE so adding _GNU_SOURCE
+            # doesn't undo the suppression.
             make VERBOSE=1 -j$(nproc) -r \
               TARGETOS=linux \
               USE_SYSTEM_LIB_ASIO=1 \
@@ -131,7 +134,7 @@ jobs:
               USE_SYSTEM_LIB_UTF8PROC=1 \
               USE_SYSTEM_LIB_GLM=1 \
               USE_SYSTEM_LIB_RAPIDJSON=1 \
-              ARCHOPTS='-U_FORTIFY_SOURCE -D__GLIBC__=2 -D__GLIBC_MINOR__=35 -D_POSIX_C_SOURCE=200809L -Dfseeko64=fseeko -Dftello64=ftello -Dfeenableexcept\(x\)=0 -Dfedisableexcept\(x\)=0 -ffunction-sections -fdata-sections -flto ${{ matrix.archopts }}' \
+              ARCHOPTS='-U_FORTIFY_SOURCE -D__GLIBC__=2 -D__GLIBC_MINOR__=35 -D_POSIX_C_SOURCE=200809L -D_GNU_SOURCE=1 -Dfseeko64=fseeko -Dftello64=ftello -Dfeenableexcept\(x\)=0 -Dfedisableexcept\(x\)=0 -ffunction-sections -fdata-sections -flto ${{ matrix.archopts }}' \
               LDOPTS='-static -Wl,--gc-sections -flto'
 
             # Test binary
