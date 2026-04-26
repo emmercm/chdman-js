@@ -92,10 +92,10 @@ jobs:
             apk add --no-cache build-base python3 \
               sdl2-dev sdl2_ttf-dev fontconfig-dev pulseaudio-dev qt5-qtbase-dev \
               alsa-lib-dev libxi-dev libxinerama-dev libxrandr-dev libxext-dev \
-              asio expat-dev expat-static zlib-dev zlib-static zstd-dev zstd-static \
+              asio-dev expat-dev expat-static zlib-dev zlib-static zstd-dev zstd-static \
               libjpeg-turbo-dev libjpeg-turbo-static flac-dev lua5.4-dev \
               sqlite-dev sqlite-static portmidi-dev portaudio-dev utf8proc-dev \
-              glm-dev rapidjson-dev pugixml-dev
+              glm-dev rapidjson-dev
             # MAME's bundled bx (3rdparty/bx) only detects glibc, MSVC, MinGW, libc++, BSD, and Bionic — there is no
             # musl branch in bx/include/bx/platform.h. On Alpine (musl), bx therefore falls through to its
             # BX_CRT_NONE path, which #includes a "crt0.h" that doesn't exist in the source tree → fatal compile
@@ -127,7 +127,6 @@ jobs:
               USE_SYSTEM_LIB_UTF8PROC=1 \
               USE_SYSTEM_LIB_GLM=1 \
               USE_SYSTEM_LIB_RAPIDJSON=1 \
-              USE_SYSTEM_LIB_PUGIXML=1 \
               ARCHOPTS='-U_FORTIFY_SOURCE -D__GLIBC__=2 -D__GLIBC_MINOR__=35 -Dfseeko64=fseeko -Dftello64=ftello -Dfeenableexcept\(x\)=0 -Dfedisableexcept\(x\)=0 -ffunction-sections -fdata-sections -flto ${{ matrix.archopts }}' \
               LDOPTS='-static -Wl,--gc-sections -flto'
 
