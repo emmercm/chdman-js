@@ -92,7 +92,7 @@ jobs:
             apk add --no-cache build-base python3 sdl2-dev sdl2_ttf-dev fontconfig-dev pulseaudio-dev qt5-qtbase-dev
             make VERBOSE=1 -j$(nproc) -r \
               TARGETOS=linux \
-              ARCHOPTS='-U_FORTIFY_SOURCE -DBX_CRT_GLIBC=1 -ffunction-sections -fdata-sections -flto ${{ matrix.archopts }}' \
+              ARCHOPTS='-U_FORTIFY_SOURCE -D__GLIBC__=2 -D__GLIBC_MINOR__=35 -ffunction-sections -fdata-sections -flto ${{ matrix.archopts }}' \
               LDOPTS='-static -Wl,--gc-sections -flto'
 
             # Test binary
