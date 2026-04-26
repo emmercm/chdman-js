@@ -149,7 +149,7 @@ jobs:
           repository: mamedev/mame
           ref: ${{ env.MAME_REF }}
       - name: Install dependencies
-        run: brew install --overwrite python3 sdl3
+        run: brew install --overwrite python3 sdl2 sdl3
       - name: Build
         env:
           USE_LIBSDL: 1
