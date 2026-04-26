@@ -57,6 +57,7 @@ jobs:
           - os: ubuntu-latest
             docker_image: alpine:latest
             docker_arch: linux/arm/v7
+            archopts: -mfpu=neon
             nodejs_arch: arm
           - os: ubuntu-latest
             docker_image: alpine:latest
@@ -91,7 +92,7 @@ jobs:
             apk add --no-cache build-base python3 sdl2-dev sdl2_ttf-dev fontconfig-dev pulseaudio-dev qt5-qtbase-dev
             make VERBOSE=1 -j$(nproc) -r \
               TARGETOS=linux \
-              ARCHOPTS='-U_FORTIFY_SOURCE -ffunction-sections -fdata-sections -flto' \
+              ARCHOPTS='-U_FORTIFY_SOURCE -ffunction-sections -fdata-sections -flto ${{ matrix.archopts }}' \
               LDOPTS='-static -Wl,--gc-sections -flto'
 
             # Test binary
