@@ -101,13 +101,14 @@ jobs:
             # we map them to the regular fseeko/ftello which are equivalent on musl.
             #
             # feenableexcept/fedisableexcept are glibc-only floating-point-exception control functions used by
-            # MAME's netlist library (src/lib/netlist/plib/pexception.cpp), which gets linked into nltool/nlwav
-            # under TOOLS=1. musl doesn't expose them. Mapping them to a constant 0 keeps the call sites
-            # well-formed (the return value is the previous FP mask; "0 = nothing was enabled" is harmless for a
-            # CLI tool that doesn't actually trap on FP exceptions).
+            # MAME's netlist (src/lib/netlist/plib/pexception.cpp), which TOOLS=1 links into nltool/nlwav. musl
+            # doesn't ship them. Mapping them to a constant 0 keeps the call sites well-formed (the return value
+            # is the previous FP mask; "0 = nothing was enabled" is harmless for a CLI tool that doesn't actually
+            # trap on FP exceptions). The parens are backslash-escaped because make's compile recipe runs through
+            # busybox sh, and unquoted (x) in the expanded command line would be parsed as a subshell.
             make VERBOSE=1 -j$(nproc) -r \
               TARGETOS=linux \
-              ARCHOPTS='-U_FORTIFY_SOURCE -D__GLIBC__=2 -D__GLIBC_MINOR__=35 -Dfseeko64=fseeko -Dftello64=ftello -Dfeenableexcept(x)=0 -Dfedisableexcept(x)=0 -ffunction-sections -fdata-sections -flto ${{ matrix.archopts }}' \
+              ARCHOPTS='-U_FORTIFY_SOURCE -D__GLIBC__=2 -D__GLIBC_MINOR__=35 -Dfseeko64=fseeko -Dftello64=ftello -Dfeenableexcept\(x\)=0 -Dfedisableexcept\(x\)=0 -ffunction-sections -fdata-sections -flto ${{ matrix.archopts }}' \
               LDOPTS='-static -Wl,--gc-sections -flto'
 
             # Test binary
