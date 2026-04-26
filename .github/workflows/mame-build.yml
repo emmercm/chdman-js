@@ -112,6 +112,13 @@ jobs:
             # is the previous FP mask; "0 = nothing was enabled" is harmless for a CLI tool that doesn't actually
             # trap on FP exceptions). The parens are backslash-escaped because make's compile recipe runs through
             # busybox sh, and unquoted (x) in the expanded command line would be parsed as a subshell.
+            #
+            # _POSIX_C_SOURCE is defined to suppress ALSA's <alsa/global.h> from redefining struct timeval/
+            # timespec. ALSA's header guards them as: #ifdef __GLIBC__ #if !defined(_POSIX_C_SOURCE) ... — and
+            # since we fake __GLIBC__, ALSA enters the glibc branch and tries to redefine structs that musl's
+            # <sys/types.h> already provides. Setting _POSIX_C_SOURCE=200809L makes the inner guard false and
+            # ALSA uses musl's existing definitions. This is needed because portaudio (compiled bundled, since
+            # Alpine ships no libportaudio.a) #includes <alsa/asoundlib.h>.
             make VERBOSE=1 -j$(nproc) -r \
               TARGETOS=linux \
               USE_SYSTEM_LIB_ASIO=1 \
@@ -124,7 +131,7 @@ jobs:
               USE_SYSTEM_LIB_UTF8PROC=1 \
               USE_SYSTEM_LIB_GLM=1 \
               USE_SYSTEM_LIB_RAPIDJSON=1 \
-              ARCHOPTS='-U_FORTIFY_SOURCE -D__GLIBC__=2 -D__GLIBC_MINOR__=35 -Dfseeko64=fseeko -Dftello64=ftello -Dfeenableexcept\(x\)=0 -Dfedisableexcept\(x\)=0 -ffunction-sections -fdata-sections -flto ${{ matrix.archopts }}' \
+              ARCHOPTS='-U_FORTIFY_SOURCE -D__GLIBC__=2 -D__GLIBC_MINOR__=35 -D_POSIX_C_SOURCE=200809L -Dfseeko64=fseeko -Dftello64=ftello -Dfeenableexcept\(x\)=0 -Dfedisableexcept\(x\)=0 -ffunction-sections -fdata-sections -flto ${{ matrix.archopts }}' \
               LDOPTS='-static -Wl,--gc-sections -flto'
 
             # Test binary
