@@ -78,6 +78,14 @@ jobs:
             --platform ${{ matrix.docker_arch }}
             --volume ${{ github.workspace }}:/build
             --workdir /build
+            --env EMULATOR
+            --env TOOLS
+            --env TESTS
+            --env IGNORE_GIT
+            --env NOWERROR
+            --env DEBUG
+            --env SYMBOLS
+            --env OPTIMIZE
           run: |
             set -euxo pipefail
             apk add --no-cache build-base python3 sdl2-dev sdl2_ttf-dev fontconfig-dev pulseaudio-dev qt5-qtbase-dev
