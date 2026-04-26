@@ -90,9 +90,18 @@ jobs:
           run: |
             set -euxo pipefail
             apk add --no-cache build-base python3 sdl2-dev sdl2_ttf-dev fontconfig-dev pulseaudio-dev qt5-qtbase-dev
+            # MAME's bundled bx (3rdparty/bx) only detects glibc, MSVC, MinGW, libc++, BSD, and Bionic — there is no
+            # musl branch in bx/include/bx/platform.h. On Alpine (musl), bx therefore falls through to its
+            # BX_CRT_NONE path, which #includes a "crt0.h" that doesn't exist in the source tree → fatal compile
+            # error in 3rdparty/bx/src/crtnone.cpp. Defining __GLIBC__ ourselves makes bx take its glibc branch
+            # (platform.h:238); musl's API surface is glibc-compatible enough for the bx CRT shim to work.
+            #
+            # The fseeko64/ftello64 aliases are needed because bx's glibc branch calls those LFS64 functions in
+            # 3rdparty/bx/src/file.cpp; musl doesn't provide *_64 variants since its off_t is already 64-bit, so
+            # we map them to the regular fseeko/ftello which are equivalent on musl.
             make VERBOSE=1 -j$(nproc) -r \
               TARGETOS=linux \
-              ARCHOPTS='-U_FORTIFY_SOURCE -D__GLIBC__=2 -D__GLIBC_MINOR__=35 -ffunction-sections -fdata-sections -flto ${{ matrix.archopts }}' \
+              ARCHOPTS='-U_FORTIFY_SOURCE -D__GLIBC__=2 -D__GLIBC_MINOR__=35 -Dfseeko64=fseeko -Dftello64=ftello -ffunction-sections -fdata-sections -flto ${{ matrix.archopts }}' \
               LDOPTS='-static -Wl,--gc-sections -flto'
 
             # Test binary
