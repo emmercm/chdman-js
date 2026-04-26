@@ -120,7 +120,7 @@ jobs:
               USE_SYSTEM_LIB_ZSTD=1 \
               USE_SYSTEM_LIB_JPEG=1 \
               USE_SYSTEM_LIB_FLAC=1 \
-              USE_SYSTEM_LIB_LUA=1 \
+              USE_SYSTEM_LIB_LUA=lua5.4:/usr/include/lua5.4 \
               USE_SYSTEM_LIB_SQLITE3=1 \
               USE_SYSTEM_LIB_PORTMIDI=1 \
               USE_SYSTEM_LIB_PORTAUDIO=1 \
