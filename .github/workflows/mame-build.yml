@@ -93,17 +93,8 @@ jobs:
               TARGETOS=linux \
               ARCHOPTS='-U_FORTIFY_SOURCE -ffunction-sections -fdata-sections -flto' \
               LDOPTS='-static -Wl,--gc-sections -flto'
-      - name: Test binary
-        uses: addnab/docker-run-action@v3
-        with:
-          image: ${{ matrix.docker_image }}
-          shell: sh
-          options: |
-            --platform ${{ matrix.docker_arch }}
-            --volume ${{ github.workspace }}:/build
-            --workdir /build
-          run: |
-            set -euxo pipefail
+
+            # Test binary
             apk add --no-cache file binutils
             ./chdman --help || true
             file chdman
@@ -117,17 +108,8 @@ jobs:
               echo "ERROR: 'file' does not report the binary as statically linked"
               exit 1
             fi
-      - name: Strip binary
-        uses: addnab/docker-run-action@v3
-        with:
-          image: ${{ matrix.docker_image }}
-          shell: sh
-          options: |
-            --platform ${{ matrix.docker_arch }}
-            --volume ${{ github.workspace }}:/build
-            --workdir /build
-          run: |
-            set -euxo pipefail
+
+            # Strip binary
             apk add --no-cache binutils
             ls -al chdman
             strip chdman
