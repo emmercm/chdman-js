@@ -93,7 +93,7 @@ jobs:
               sdl2-dev sdl2_ttf-dev fontconfig-dev pulseaudio-dev qt5-qtbase-dev \
               alsa-lib-dev libxi-dev libxinerama-dev libxrandr-dev libxext-dev \
               asio-dev expat-dev expat-static zlib-dev zlib-static zstd-dev zstd-static \
-              libjpeg-turbo-dev libjpeg-turbo-static flac-dev flac-static \
+              libjpeg-turbo-dev libjpeg-turbo-static \
               sqlite-dev sqlite-static utf8proc-dev \
               glm-dev rapidjson-dev
             # MAME's bundled bx (3rdparty/bx) only detects glibc, MSVC, MinGW, libc++, BSD, and Bionic — there is no
@@ -129,7 +129,6 @@ jobs:
               USE_SYSTEM_LIB_ZLIB=1 \
               USE_SYSTEM_LIB_ZSTD=1 \
               USE_SYSTEM_LIB_JPEG=1 \
-              USE_SYSTEM_LIB_FLAC=1 \
               USE_SYSTEM_LIB_SQLITE3=1 \
               USE_SYSTEM_LIB_UTF8PROC=1 \
               USE_SYSTEM_LIB_GLM=1 \
