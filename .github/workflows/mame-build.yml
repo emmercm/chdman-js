@@ -27,7 +27,7 @@ permissions:
 env:
   CHDMANJS_REF: ${{ github.head_ref || github.ref }}
 
-  MAME_REF: ${{ inputs.mame_ref || 'mame0281' }}
+  MAME_REF: ${{ inputs.mame_ref || 'mame0287' }}
   # `make` options
   EMULATOR: 0
   TOOLS: 1
@@ -40,71 +40,123 @@ env:
 
 jobs:
   build-linux:
-    # gcc-cross/*-linux-gnu/13 seems to have issues as of mame0274
-    # https://github.com/emmercm/chdman-js/actions/runs/13294147953/job/37121892032
-    runs-on: ubuntu-22.04
+    name: build-linux ${{ matrix.nodejs_arch }}
     strategy:
       fail-fast: false
       matrix:
         include:
-          - apt_architecture: amd64
-            nodejs_arch: x64
-          - apt_architecture: i386
-            cc: i686-linux-gnu-gcc-11
-            cxx: i686-linux-gnu-g++-11
-            strip: i686-gnu-strip
+          - os: ubuntu-latest
+            docker_image: i386/alpine:latest
+            docker_arch: linux/386
             nodejs_arch: ia32
-          - apt_architecture: armhf
-            cc: arm-linux-gnueabihf-gcc-11
-            cxx: arm-linux-gnueabihf-g++-11
+          - os: ubuntu-latest
+            docker_image: alpine:latest
+            docker_arch: linux/amd64
+            nodejs_arch: x64
+          - os: ubuntu-24.04-arm
+            docker_image: alpine:latest
+            docker_arch: linux/arm/v7
             archopts: -mfpu=neon
-            strip: arm-linux-gnueabihf-strip
             nodejs_arch: arm
-          - apt_architecture: arm64
-            cc: aarch64-linux-gnu-gcc-11
-            cxx: aarch64-linux-gnu-g++-11
-            strip: aarch64-linux-gnu-strip
+          - os: ubuntu-24.04-arm
+            docker_image: alpine:latest
+            docker_arch: linux/arm64/v8
             nodejs_arch: arm64
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
         with:
           repository: mamedev/mame
           ref: ${{ env.MAME_REF }}
-      - name: Install dependencies
-        run: |
-          # https://docs.mamedev.org/initialsetup/compilingmame.html#debian-and-ubuntu-including-raspberry-pi-and-odroid-devices
-          sudo apt-get update
-          sudo apt-get install --yes git build-essential python3 libsdl2-dev libsdl2-ttf-dev libfontconfig-dev libpulse-dev qtbase5-dev qtbase5-dev-tools qtchooser qt5-qmake \
-
-          sudo sed -ie "s/deb /deb [arch=$(dpkg --print-architecture)] /g" /etc/apt/sources.list
-          sudo dpkg --add-architecture amd64
-          sudo dpkg --add-architecture i386
-          echo "deb [arch=amd64,i386] http://archive.ubuntu.com/ubuntu/ $(lsb_release --codename | awk '{print $2}') main multiverse restricted universe" | sudo tee -a /etc/apt/sources.list
-          echo "deb [arch=amd64,i386] http://archive.ubuntu.com/ubuntu/ $(lsb_release --codename | awk '{print $2}')-updates main multiverse restricted universe" | sudo tee -a /etc/apt/sources.list
-          sudo dpkg --add-architecture armhf
-          sudo dpkg --add-architecture arm64
-          echo "deb [arch=armhf,arm64,ppc64el,riscv64,s390x] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release --codename | awk '{print $2}') main multiverse restricted universe" | sudo tee -a /etc/apt/sources.list
-          echo "deb [arch=armhf,arm64,ppc64el,riscv64,s390x] http://ports.ubuntu.com/ubuntu-ports/ $(lsb_release --codename | awk '{print $2}')-updates main multiverse restricted universe" | sudo tee -a /etc/apt/sources.list
-          sudo apt-get update || true
-          sudo apt-get install --yes crossbuild-essential-${{ matrix.apt_architecture }} libsdl2-dev:${{ matrix.apt_architecture }}
+      - uses: docker/setup-qemu-action@v3
       - name: Build
-        env:
-          OVERRIDE_CC: ${{ matrix.cc || 'gcc' }}
-          OVERRIDE_CXX: ${{ matrix.cxx || 'g++' }}
-          ARCHOPTS: -U_FORTIFY_SOURCE ${{ matrix.archopts }}
-          TARGETOS: linux
-        run: make "-j$(nproc)" -r
+        uses: addnab/docker-run-action@v3
+        with:
+          image: ${{ matrix.docker_image }}
+          shell: sh
+          options: |
+            --platform ${{ matrix.docker_arch }}
+            --volume ${{ github.workspace }}:/build
+            --workdir /build
+            --env EMULATOR
+            --env TOOLS
+            --env TESTS
+            --env IGNORE_GIT
+            --env NOWERROR
+            --env DEBUG
+            --env SYMBOLS
+            --env OPTIMIZE
+          run: |
+            set -euxo pipefail
+            apk add --no-cache build-base python3 \
+              sdl2-dev sdl2_ttf-dev fontconfig-dev pulseaudio-dev qt5-qtbase-dev \
+              alsa-lib-dev libxi-dev libxinerama-dev libxrandr-dev libxext-dev \
+              asio-dev expat-dev expat-static zlib-dev zlib-static zstd-dev zstd-static \
+              libjpeg-turbo-dev libjpeg-turbo-static \
+              sqlite-dev sqlite-static utf8proc-dev \
+              glm-dev rapidjson-dev
+            # MAME's bundled bx (3rdparty/bx) only detects glibc, MSVC, MinGW, libc++, BSD, and Bionic — there is no
+            # musl branch in bx/include/bx/platform.h. On Alpine (musl), bx therefore falls through to its
+            # BX_CRT_NONE path, which #includes a "crt0.h" that doesn't exist in the source tree → fatal compile
+            # error in 3rdparty/bx/src/crtnone.cpp. Defining __GLIBC__ ourselves makes bx take its glibc branch
+            # (platform.h:238); musl's API surface is glibc-compatible enough for the bx CRT shim to work.
+            #
+            # The fseeko64/ftello64 aliases are needed because bx's glibc branch calls those LFS64 functions in
+            # 3rdparty/bx/src/file.cpp; musl doesn't provide *_64 variants since its off_t is already 64-bit, so
+            # we map them to the regular fseeko/ftello which are equivalent on musl.
+            #
+            # feenableexcept/fedisableexcept are glibc-only floating-point-exception control functions used by
+            # MAME's netlist (src/lib/netlist/plib/pexception.cpp), which TOOLS=1 links into nltool/nlwav. musl
+            # doesn't ship them. Mapping them to a constant 0 keeps the call sites well-formed (the return value
+            # is the previous FP mask; "0 = nothing was enabled" is harmless for a CLI tool that doesn't actually
+            # trap on FP exceptions). The parens are backslash-escaped because make's compile recipe runs through
+            # busybox sh, and unquoted (x) in the expanded command line would be parsed as a subshell.
+            #
+            # _POSIX_C_SOURCE is defined to suppress ALSA's <alsa/global.h> from redefining struct timeval/
+            # timespec. ALSA's header guards them as: #ifdef __GLIBC__ #if !defined(_POSIX_C_SOURCE) ... — and
+            # since we fake __GLIBC__, ALSA enters the glibc branch and tries to redefine structs that musl's
+            # <sys/types.h> already provides. Setting _POSIX_C_SOURCE=200809L makes the inner guard false and
+            # ALSA uses musl's existing definitions. This is needed because portaudio (compiled bundled, since
+            # Alpine ships no libportaudio.a) #includes <alsa/asoundlib.h>. _GNU_SOURCE is then layered on top
+            # to re-expose extensions (alloca, full struct timespec under all include paths) that strict POSIX
+            # mode would hide; ALSA's struct-redef guard only checks for _POSIX_C_SOURCE so adding _GNU_SOURCE
+            # doesn't undo the suppression.
+            make VERBOSE=1 -j$(nproc) -r \
+              TARGETOS=linux \
+              USE_SYSTEM_LIB_ASIO=1 \
+              USE_SYSTEM_LIB_EXPAT=1 \
+              USE_SYSTEM_LIB_ZLIB=1 \
+              USE_SYSTEM_LIB_ZSTD=1 \
+              USE_SYSTEM_LIB_JPEG=1 \
+              USE_SYSTEM_LIB_SQLITE3=1 \
+              USE_SYSTEM_LIB_UTF8PROC=1 \
+              USE_SYSTEM_LIB_GLM=1 \
+              USE_SYSTEM_LIB_RAPIDJSON=1 \
+              ARCHOPTS='-U_FORTIFY_SOURCE -D__GLIBC__=2 -D__GLIBC_MINOR__=35 -D_POSIX_C_SOURCE=200809L -D_GNU_SOURCE=1 -Dfseeko64=fseeko -Dftello64=ftello -Dfeenableexcept\(x\)=0 -Dfedisableexcept\(x\)=0 -ffunction-sections -fdata-sections -flto ${{ matrix.archopts }}' \
+              LDOPTS='-static -Wl,--gc-sections -flto'
+
+            # Test binary
+            ./chdman --help || true
+
+            # Strip binary
+            apk add --no-cache binutils
+            ls -al chdman
+            strip chdman
+            ls -al chdman
       - name: Test binary
         run: |
           set -x
           file chdman
-          readelf -d chdman | grep NEEDED
-      - name: Strip binary
-        run: |
-          sudo apt-get install --yes binutils binutils-i686-gnu binutils-arm-linux-gnueabihf binutils-aarch64-linux-gnu
-          ls -al chdman
-          ${{ matrix.strip || 'strip' }} chdman
-          ls -al chdman
+          readelf -d chdman
+          if readelf -d chdman | grep -q NEEDED; then
+            echo "ERROR: binary has dynamic dependencies, expected fully static"
+            readelf -d chdman | grep NEEDED
+            exit 1
+          fi
+          if ! file chdman | grep -qE 'statically linked|static-pie linked'; then
+            echo "ERROR: 'file' does not report the binary as statically linked"
+            exit 1
+          fi
       - name: Rename binary
         run: |
           dir="artifacts/packages/chdman-linux-${{ matrix.nodejs_arch }}"
@@ -113,7 +165,7 @@ jobs:
           ls -al "${dir}/"
       - uses: actions/upload-artifact@v4
         with:
-          name: ${{ runner.os }}-${{ matrix.apt_architecture }}-${{ github.sha }}
+          name: ${{ runner.os }}-${{ matrix.nodejs_arch }}-${{ github.sha }}
           path: artifacts/**/chdman
           if-no-files-found: error
 
@@ -130,10 +182,11 @@ jobs:
           repository: mamedev/mame
           ref: ${{ env.MAME_REF }}
       - name: Install dependencies
-        run: brew install --overwrite python3 sdl3
+        run: brew install --overwrite python3 sdl2 sdl3
       - name: Build
         env:
           USE_LIBSDL: 1
+          ARCHOPTS: "-ffunction-sections -fdata-sections -flto -Wl,-dead_strip"
         run: make "-j$(sysctl -n hw.physicalcpu)" -r
       - name: Make portable
         run: |
@@ -143,7 +196,7 @@ jobs:
             cp "${file}" ./
             install_name_tool -change "${file}" "@executable_path/$(basename "${file}")" chdman
           done
-          brew uninstall --ignore-dependencies sdl3
+          brew uninstall --ignore-dependencies sdl2 sdl3
       - name: Test binary
         run: |
           set -x
@@ -209,7 +262,7 @@ jobs:
           OVERRIDE_AR: "llvm-ar"
           OVERRIDE_CC: clang
           OVERRIDE_CXX: clang++
-          ARCHOPTS: "-fuse-ld=lld"
+          ARCHOPTS: "-fuse-ld=lld -ffunction-sections -fdata-sections -flto -Wl,--gc-sections"
         run: make VERBOSE=1 -j$(nproc) -r
       - name: Test binary
         run: |
