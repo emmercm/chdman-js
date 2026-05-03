@@ -54,12 +54,12 @@ jobs:
             docker_image: alpine:latest
             docker_arch: linux/amd64
             nodejs_arch: x64
-          - os: ubuntu-latest
+          - os: ubuntu-24.04-arm
             docker_image: alpine:latest
             docker_arch: linux/arm/v7
             archopts: -mfpu=neon
             nodejs_arch: arm
-          - os: ubuntu-latest
+          - os: ubuntu-24.04-arm
             docker_image: alpine:latest
             docker_arch: linux/arm64/v8
             nodejs_arch: arm64
