@@ -16,7 +16,6 @@ on:
         required: true
         type: boolean
         default: true
-  push:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -284,3 +283,79 @@ jobs:
           name: ${{ runner.os }}-${{ matrix.msystem }}-${{ github.sha }}
           path: artifacts/**/chdman.exe
           if-no-files-found: error
+
+  git-update:
+    if: ${{ !startsWith(github.event_name, 'pull_request') }}  # debug protection
+    needs:
+      - build-linux
+      - build-macos
+      - build-windows
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.CHDMANJS_REF }}
+      - name: Delete old macoS .dylibs
+        run: |
+          rm packages/*-darwin-*/*.dylib
+      - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+      - uses: actions/setup-node@v4
+      - id: bump-and-commit
+        run: |
+          package_name=$(jq --raw-output '.name' packages/chdman/package.json)
+          major_version=$(npm show "${package_name}" --json | jq --raw-output '.versions | .[]' | sed 's/\.[0-9]*//g' | sort | tail -1)
+          # shellcheck disable=SC2001
+          minor_version=$(echo "${MAME_REF}" | sed 's/[^0-9]*//g' | sed 's/^0*//')
+          previous_version=$(npm show "${package_name}" --json | jq --raw-output '.versions | .[]' | grep "${minor_version}" | tail -1)
+          if [[ "${previous_version}" != "" ]]; then
+            # shellcheck disable=SC2001
+            new_patch_version=$(echo "$(echo "${previous_version}" | sed 's/[0-9]*\.//g') + 1" | bc)
+            new_version="${major_version}.${minor_version}.${new_patch_version}"
+          else
+            new_version="${major_version}.${minor_version}.0"
+          fi
+          lerna version "${new_version}" --yes || true
+
+          chmod +x packages/chdman-*-*/chdman*
+          ls -lR
+          git add package*.json lerna.json packages
+
+          USER_EMAIL="${GITHUB_ACTOR_ID}+${GITHUB_ACTOR}@users.noreply.github.com"
+          echo "USER_EMAIL=${USER_EMAIL}" >> "${GITHUB_OUTPUT}"
+          git config --global user.email "${USER_EMAIL}"
+
+          USER_NAME="$(gh api "/users/${GITHUB_ACTOR}" | jq .name -r)"
+          echo "USER_NAME=${USER_NAME}" >> "${GITHUB_OUTPUT}"
+          git config --global user.name "${USER_NAME}"
+
+          PACKAGE_VERSION="$(jq --raw-output '.version' packages/chdman/package.json)"
+          echo "PACKAGE_VERSION=${PACKAGE_VERSION}" >> "${GITHUB_OUTPUT}"
+          git commit -m "v${PACKAGE_VERSION}"
+        env:
+          GH_TOKEN: ${{ github.token }}
+      # Create the pull request, and optionally mark it as auto-merge
+      - id: create-pull-request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          # GitHub won't run workflows off of events from the `github-actions` user
+          # But also, I want the PR to be created under my name for cosmetic reasons
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          author: ${{ steps.bump-and-commit.outputs.USER_NAME }} <${{ steps.bump-and-commit.outputs.USER_EMAIL }}>
+          branch: ${{ github.actor }}/${{ steps.bump-and-commit.outputs.PACKAGE_VERSION }}
+          delete-branch: true
+          title: v${{ steps.bump-and-commit.outputs.PACKAGE_VERSION }}
+          assignees: ${{ !inputs.auto-merge && github.repository_owner || '' }}
+          reviewers: ${{ (!inputs.auto-merge && github.repository_owner != github.actor) && github.repository_owner || '' }}
+      - if: ${{ steps.create-pull-request.outputs.pull-request-number }}
+        run: |
+          {
+            echo "# v${{ steps.bump-and-commit.outputs.PACKAGE_VERSION }}"
+            echo ""
+            echo "${{ steps.create-pull-request.outputs.pull-request-url }}"
+          } >> "${GITHUB_STEP_SUMMARY}"
+      - if: ${{ steps.create-pull-request.outputs.pull-request-number && inputs.auto-merge }}
+        run: gh pr merge "${{ steps.create-pull-request.outputs.pull-request-number }}" --squash --auto
+        env:
+          GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
