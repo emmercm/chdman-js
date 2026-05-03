@@ -137,25 +137,27 @@ jobs:
               LDOPTS='-static -Wl,--gc-sections -flto'
 
             # Test binary
-            apk add --no-cache file binutils
             ./chdman --help || true
-            file chdman
-            readelf -d chdman || true
-            if readelf -d chdman | grep -q NEEDED; then
-              echo "ERROR: binary has dynamic dependencies, expected fully static"
-              readelf -d chdman | grep NEEDED
-              exit 1
-            fi
-            if ! file chdman | grep -qE 'statically linked|static-pie linked'; then
-              echo "ERROR: 'file' does not report the binary as statically linked"
-              exit 1
-            fi
 
             # Strip binary
             apk add --no-cache binutils
             ls -al chdman
             strip chdman
             ls -al chdman
+      - name: Test binary
+        run: |
+          set -x
+          file chdman
+          readelf -d chdman
+          if readelf -d chdman | grep -q NEEDED; then
+            echo "ERROR: binary has dynamic dependencies, expected fully static"
+            readelf -d chdman | grep NEEDED
+            exit 1
+          fi
+          if ! file chdman | grep -qE 'statically linked|static-pie linked'; then
+            echo "ERROR: 'file' does not report the binary as statically linked"
+            exit 1
+          fi
       - name: Rename binary
         run: |
           dir="artifacts/packages/chdman-linux-${{ matrix.nodejs_arch }}"
