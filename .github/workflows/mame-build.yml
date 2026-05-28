@@ -27,7 +27,7 @@ permissions:
 env:
   CHDMANJS_REF: ${{ github.head_ref || github.ref }}
 
-  MAME_REF: ${{ inputs.mame_ref || 'mame0287' }}
+  MAME_REF: ${{ inputs.mame_ref || 'mame0288' }}
   # `make` options
   EMULATOR: 0
   TOOLS: 1
@@ -37,10 +37,11 @@ env:
   DEBUG: 0
   SYMBOLS: 0
   OPTIMIZE: s
+  USE_QTDEBUG: 0
 
 jobs:
   build-linux:
-    name: build-linux ${{ matrix.nodejs_arch }}
+    name: build-linux (${{ matrix.docker_arch }})
     strategy:
       fail-fast: false
       matrix:
@@ -86,10 +87,11 @@ jobs:
             --env DEBUG
             --env SYMBOLS
             --env OPTIMIZE
+            --env USE_QTDEBUG
           run: |
             set -euxo pipefail
             apk add --no-cache build-base python3 \
-              sdl2-dev sdl2_ttf-dev fontconfig-dev pulseaudio-dev qt5-qtbase-dev \
+              sdl2-dev sdl2_ttf-dev fontconfig-dev pulseaudio-dev qt5-qtbase-dev qt6-qtbase-dev \
               alsa-lib-dev libxi-dev libxinerama-dev libxrandr-dev libxext-dev \
               asio-dev expat-dev expat-static zlib-dev zlib-static zstd-dev zstd-static \
               libjpeg-turbo-dev libjpeg-turbo-static \
@@ -226,13 +228,15 @@ jobs:
 
   # https://github.com/mamedev/mame/blob/4505d5459fed086d35f08d7572cb55cd661cd707/.github/workflows/ci-windows.yml
   build-windows:
+    name: build-windows (${{ matrix.os }})
     strategy:
       fail-fast: false
       matrix:
         include:
           - os: windows-latest
-            msystem: mingw64
+            msystem: clang64
             nodejs_arch: x64
+            pacboy: gcc-compat:p
           # Windows ARM64 builds started being published with MAME v0.281 (Sep 2025)
           - os: windows-11-arm
             msystem: clangarm64
