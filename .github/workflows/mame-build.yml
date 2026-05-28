@@ -42,7 +42,7 @@ env:
 
 jobs:
   build-linux:
-    name: build-linux ${{ matrix.nodejs_arch }}
+    name: build-linux (${{ matrix.docker_arch }})
     strategy:
       fail-fast: false
       matrix:
@@ -229,6 +229,7 @@ jobs:
 
   # https://github.com/mamedev/mame/blob/4505d5459fed086d35f08d7572cb55cd661cd707/.github/workflows/ci-windows.yml
   build-windows:
+    name: build-windows (${{ matrix.os }})
     strategy:
       fail-fast: false
       matrix:
