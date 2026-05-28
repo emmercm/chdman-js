@@ -92,7 +92,7 @@ jobs:
           run: |
             set -euxo pipefail
             apk add --no-cache build-base python3 \
-              sdl2-dev sdl2_ttf-dev fontconfig-dev pulseaudio-dev qt5-qtbase-dev \
+              sdl2-dev sdl2_ttf-dev fontconfig-dev pulseaudio-dev qt5-qtbase-dev qt6-qtbase-dev \
               alsa-lib-dev libxi-dev libxinerama-dev libxrandr-dev libxext-dev \
               asio-dev expat-dev expat-static zlib-dev zlib-static zstd-dev zstd-static \
               libjpeg-turbo-dev libjpeg-turbo-static \
