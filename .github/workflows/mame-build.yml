@@ -56,9 +56,15 @@ jobs:
             nodejs_arch: x64
           - os: ubuntu-24.04-arm
             docker_image: alpine:latest
+            docker_arch: linux/arm/v6
+            nodejs_arch: arm
+            exe_name: chdman-armv6
+          - os: ubuntu-24.04-arm
+            docker_image: alpine:latest
             docker_arch: linux/arm/v7
             archopts: -mfpu=neon
             nodejs_arch: arm
+            exe_name: chdman-armv7
           - os: ubuntu-24.04-arm
             docker_image: alpine:latest
             docker_arch: linux/arm64/v8
@@ -299,8 +305,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ env.CHDMANJS_REF }}
-      - name: Delete old macoS .dylibs
+      - name: Delete old binaries
         run: |
+          rm packages/*/chdman*
           rm packages/*-darwin-*/*.dylib
       - uses: actions/download-artifact@v4
         with:
