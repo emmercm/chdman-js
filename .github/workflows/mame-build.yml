@@ -156,6 +156,7 @@ jobs:
         run: |
           set -x
           file chdman
+          readelf -A chdman
           readelf -d chdman
           if readelf -d chdman | grep -q NEEDED; then
             echo "ERROR: binary has dynamic dependencies, expected fully static"
