@@ -95,15 +95,11 @@ jobs:
         docker-arch:
           - linux/arm/v6
           - linux/arm/v7
-        node-version:
-          - lts
-          # Using this instead of v16.6.0 to get npm v8.1+ to fix workspace issues
-          - 16.12.0
     steps:
       - uses: actions/checkout@v4
       - uses: addnab/docker-run-action@v3
         with:
-          image: node:${{ matrix.node-version }}
+          image: alpine:latest
           shell: sh
           options: |
             --platform ${{ matrix.docker-arch }}
@@ -111,13 +107,18 @@ jobs:
             --workdir /test
           run: |
             set -euxo pipefail
+
+            apk add --no-cache nodejs
             npm ci --force
+
             # Test the source files
             npm run test:unit
+
             # Test running
             npm start --workspace=packages/chdman -- help
             npm start --workspace=packages/chdman -- createcd --input test/fixtures/cue/multiple.cue --output multiple.chd --hunksize 14688
             npm start --workspace=packages/chdman -- info --input multiple.chd
+
             # Test building
             npm run build
 
