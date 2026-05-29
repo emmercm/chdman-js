@@ -108,7 +108,7 @@ jobs:
           run: |
             set -euxo pipefail
 
-            apk add --no-cache nodejs
+            apk add --no-cache nodejs npm
             npm ci --force
 
             # Test the source files
