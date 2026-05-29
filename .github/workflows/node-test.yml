@@ -53,7 +53,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-latest, ubuntu-24.04-arm, macos-15-intel, macos-15, windows-latest, windows-11-arm ]
+        os:
+          - ubuntu-latest
+          - ubuntu-24.04-arm
+          - macos-15-intel
+          - macos-15
+          - windows-latest
+          - windows-11-arm
         node-version:
           - lts
           # Minimum version for lerna@9.0.7
@@ -65,10 +71,6 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - run: npm ci --force
-      - if: ${{ startsWith(matrix.os, 'ubuntu') }}
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libsdl2-2.0-0 libsdl2-ttf-2.0-0
 
       # Test the source files
       - run: npm run test:unit
@@ -82,6 +84,45 @@ jobs:
       # Test building
       - run: npm run build
 
+  node-test-docker:
+    needs:
+      - path-filter
+    if: ${{ needs.path-filter.outputs.changes == 'true' }}
+    runs-on: ubuntu-24.04-arm
+    strategy:
+      fail-fast: false
+      matrix:
+        docker-arch:
+          - linux/arm/v6
+          - linux/arm/v7
+    steps:
+      # Setup and install
+      - uses: actions/checkout@v4
+      - uses: volta-cli/action@v4
+      - run: npm ci --force
+      - uses: addnab/docker-run-action@v3
+        with:
+          image: alpine:latest
+          shell: sh
+          options: |
+            --platform ${{ matrix.docker-arch }}
+            --volume ${{ github.workspace }}:/test
+            --workdir /test
+          run: |
+            set -euxo pipefail
+            apk add --no-cache nodejs npm
+
+            # Test the source files
+            npm run test:unit --workspace=packages/chdman
+
+            # Test running
+            npm start --workspace=packages/chdman -- help
+            npm start --workspace=packages/chdman -- createcd --input test/fixtures/cue/multiple.cue --output multiple.chd --hunksize 14688
+            npm start --workspace=packages/chdman -- info --input multiple.chd
+
+            # Test building
+            npm run build --workspace=packages/chdman
+
   # !!! This check should be required by GitHub !!!
   test-status-check:
     if: always()
@@ -89,9 +130,10 @@ jobs:
       - path-filter
       - node-lint
       - node-test
+      - node-test-docker
     runs-on: ubuntu-latest
     steps:
       - uses: re-actors/alls-green@release/v1
         with:
-          allowed-skips: node-lint, node-test
+          allowed-skips: node-lint, node-test, node-test-docker
           jobs: ${{ toJSON(needs) }}
