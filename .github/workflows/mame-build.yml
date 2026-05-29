@@ -172,11 +172,11 @@ jobs:
           dir="artifacts/packages/chdman-linux-${{ matrix.nodejs_arch }}"
           mkdir -p "${dir}"
           mv chdman "${dir}/"
-          ls -al "${dir}/"
+          ls -al "${dir}/${{ matrix.exe_name }}"
       - uses: actions/upload-artifact@v4
         with:
-          name: ${{ runner.os }}-${{ matrix.nodejs_arch }}-${{ github.sha }}
-          path: artifacts/**/chdman
+          name: ${{ runner.os }}-${{ matrix.nodejs_arch }}-${{ matrix.exe_name || 'chdman' }}-${{ github.sha }}
+          path: artifacts/**/chdman*
           if-no-files-found: error
 
   # https://github.com/mamedev/mame/blob/4505d5459fed086d35f08d7572cb55cd661cd707/.github/workflows/ci-macos.yml
