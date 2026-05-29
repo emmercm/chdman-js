@@ -62,8 +62,8 @@ jobs:
           - windows-11-arm
         node-version:
           - lts
-          # Using this instead of v16.6.0 to get npm v8.1+ to fix workspace issues
-          - 16.12.0
+          # Minimum version for lerna@9.0.7
+          - 20.19.0
     steps:
       # Setup and install
       - uses: actions/checkout@v4
