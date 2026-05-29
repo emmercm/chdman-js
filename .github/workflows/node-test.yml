@@ -96,7 +96,10 @@ jobs:
           - linux/arm/v6
           - linux/arm/v7
     steps:
+      # Setup and install
       - uses: actions/checkout@v4
+      - uses: volta-cli/action@v4
+      - run: npm ci --force
       - uses: addnab/docker-run-action@v3
         with:
           image: alpine:latest
@@ -107,12 +110,10 @@ jobs:
             --workdir /test
           run: |
             set -euxo pipefail
-
             apk add --no-cache nodejs npm
-            npm ci --force
 
             # Test the source files
-            npm run test:unit
+            npm run test:unit --workspace=packages/chdman
 
             # Test running
             npm start --workspace=packages/chdman -- help
@@ -120,7 +121,7 @@ jobs:
             npm start --workspace=packages/chdman -- info --input multiple.chd
 
             # Test building
-            npm run build
+            npm run build --workspace=packages/chdman
 
   # !!! This check should be required by GitHub !!!
   test-status-check:
