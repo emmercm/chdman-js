@@ -171,7 +171,7 @@ jobs:
         run: |
           dir="artifacts/packages/chdman-linux-${{ matrix.nodejs_arch }}"
           mkdir -p "${dir}"
-          mv chdman "${dir}/"
+          mv chdman "${dir}/${{ matrix.exe_name }}"
           ls -al "${dir}/${{ matrix.exe_name }}"
       - uses: actions/upload-artifact@v4
         with:
