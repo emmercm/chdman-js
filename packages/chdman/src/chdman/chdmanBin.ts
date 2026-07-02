@@ -118,7 +118,7 @@ export default class ChdmanBin {
           await util.promisify(fs.chmod)(temporaryBlob, 0o755); // chmod +x
           return temporaryBlob;
         }));
-        return temporaryBlobs.find((temporaryBlob) => path.basename(temporaryBlob).startsWith('chdman'));
+        return temporaryBlobs.find((temporaryBlob) => path.basename(temporaryBlob).toLowerCase().startsWith('chdman'));
       }
     } catch { /* ignored */ }
 
